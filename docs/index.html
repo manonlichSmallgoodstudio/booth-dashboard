@@ -9,26 +9,22 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  /* โทนสีใหม่สไตล์ Deep Blue / Neon Glow */
-  --bg-color: #060b19; /* สีพื้นหลังหลัก */
-  --surface: rgba(16, 24, 46, 0.6); /* การ์ดสไตล์กระจกโปร่งแสง */
+  --bg-color: #060b19;
+  --surface: rgba(16, 24, 46, 0.6);
   --surface-hover: rgba(23, 33, 59, 0.8);
-  --border: rgba(255, 255, 255, 0.05); /* ขอบบางๆ เรืองแสงนิดๆ */
+  --border: rgba(255, 255, 255, 0.05);
   --border2: rgba(255, 255, 255, 0.1);
   --text: #ffffff;
   --text2: #94a3b8;
   --text3: #64748b;
-  
-  /* สี Accent เจ็บๆ แนว Neon */
-  --accent: #3b82f6;      /* Blue */
+  --accent: #3b82f6;
   --accent-bg: rgba(59, 130, 246, 0.15);
-  --photo: #06b6d4;       /* Cyan */
-  --video: #8b5cf6;       /* Purple */
-  --abandoned: #f43f5e;   /* Pinkish Red */
-  --radius: 16px;         /* มุมโค้งมากขึ้นแบบ Modern UI */
+  --photo: #06b6d4;
+  --video: #8b5cf6;
+  --abandoned: #f43f5e;
+  --radius: 16px;
 }
 
-/* พื้นหลังไล่สีสไตล์มีไฟส่องจากด้านหลัง (Ambient Glow) */
 body { 
   font-family: 'Plus Jakarta Sans', sans-serif; 
   background-color: var(--bg-color);
@@ -42,7 +38,6 @@ body {
   min-height: 100vh;
 }
 
-/* Glassmorphism Effect สำหรับทุกกล่อง */
 .glass-panel {
   background: var(--surface);
   backdrop-filter: blur(12px);
@@ -66,7 +61,6 @@ body {
 
 .main { padding: 24px; max-width: 1440px; margin: 0 auto; }
 
-/* แถบเชื่อมต่อและ Filter */
 .file-bar { display: flex; align-items: center; gap: 16px; padding: 12px 20px; margin-bottom: 24px; flex-wrap: wrap; }
 .file-name { font-size: 13px; font-weight: 600; color: var(--photo); flex: 1; }
 .file-meta { font-size: 12px; color: var(--text2); white-space: nowrap; }
@@ -87,24 +81,20 @@ select option { background: #0f172a; color: #fff; }
 .toggle-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); }
 .toggle-btn.off { opacity: 0.4; }
 
-/* การ์ดตัวเลขสรุป */
 .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .metric-card { padding: 20px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-/* แต่งแสงสีตรงหัวมุมการ์ดให้เหมือนในรูป */
 .metric-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--border2), transparent); }
 .metric-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
 .metric-value { font-size: 32px; font-weight: 700; line-height: 1; color: var(--text); letter-spacing: -1px; }
 .metric-sub { font-size: 11px; font-weight: 500; color: var(--text3); margin-top: 8px; display: flex; align-items: center; gap: 4px; }
 .trend-up { color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px; }
 
-/* โซนกราฟ */
 .charts-2col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
 .chart-card { padding: 24px; }
 .chart-card.hidden { display: none; }
 .chart-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
 .chart-wrap { position: relative; height: 280px; width: 100%; }
 
-/* โซนตาราง */
 .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 .tbl th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 12px 12px 12px; border-bottom: 1px solid var(--border); }
 .tbl td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.02); color: var(--text2); font-weight: 500; }
@@ -113,7 +103,6 @@ select option { background: #0f172a; color: #fff; }
 .tbar { height: 4px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; margin-top: 6px; min-width: 80px; }
 .tbar-fill { height: 100%; border-radius: 4px; }
 
-/* โซน Feed */
 .sessions-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; padding-right: 8px; }
 .session-row { display: grid; grid-template-columns: 80px 140px 1fr 60px; align-items: center; gap: 16px; padding: 12px 16px; border-radius: 12px; font-size: 13px; background: rgba(0,0,0,0.2); border: 1px solid transparent; transition: all 0.2s; }
 .session-row:hover { background: var(--surface-hover); border-color: var(--border2); transform: translateY(-1px); }
@@ -132,13 +121,56 @@ select option { background: #0f172a; color: #fff; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
+/* 📱 Responsive สำหรับ iPad/Tablet */
 @media (max-width: 1024px) {
   .charts-2col { grid-template-columns: 1fr; }
 }
-@media (max-width: 800px) {
-  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-  .session-row { grid-template-columns: 70px 1fr 40px; }
-  .stime { display: none; }
+
+/* 📱 Responsive สำหรับ Mobile มือถือ */
+@media (max-width: 768px) {
+  .topbar { padding: 12px 16px; height: auto; min-height: 56px; flex-wrap: wrap; }
+  .logo { font-size: 14px; }
+  .last-update { display: none; /* ซ่อนเวลาโหลดบนมือถือเพื่อประหยัดที่ */ }
+  .main { padding: 12px; }
+  
+  /* ลดขนาด Padding การ์ดด้านบน และจัดเป็น 2 คอลัมน์แบบเต็มจอ */
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+  .metric-card { padding: 12px; border-radius: 12px; }
+  .metric-label { font-size: 11px; margin-bottom: 4px; }
+  .metric-value { font-size: 24px; }
+  .metric-sub { font-size: 9px; margin-top: 4px; }
+
+  /* จัดเรียงแถบ Filter ให้เป็น 2 คอลัมน์ และปุ่มเต็มบรรทัด */
+  .filter-bar { gap: 10px; padding: 12px; margin-bottom: 16px; justify-content: space-between; border-radius: 12px; }
+  .filter-group { flex: 1 1 calc(50% - 5px); }
+  .filter-select { min-width: 0; width: 100%; font-size: 12px; padding: 8px 24px 8px 8px; background-position: right 8px center; }
+  .filter-reset { flex: 1 1 100%; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; margin-top: 4px; font-size: 13px; }
+
+  /* ปุ่ม Toggle สลับมุมมองจัดใหม่ให้กดง่าย */
+  .toggle-bar { justify-content: flex-start; margin-bottom: 16px; gap: 6px; }
+  .toggle-label { width: 100%; margin-bottom: 4px; font-size: 11px; }
+  .toggle-btn { flex: 1 1 calc(33.33% - 6px); padding: 8px 6px; font-size: 11px; text-align: center; justify-content: center; }
+
+  /* โซนกราฟ ลดความสูงลงมานิดหน่อยไม่ให้กินที่ */
+  .chart-card { padding: 16px 12px; border-radius: 12px; }
+  .chart-wrap { height: 220px; }
+  .chart-title { font-size: 13px; margin-bottom: 12px; }
+  
+  /* ทำให้ตารางสถิติ Template ปัดซ้าย-ขวาได้ (Horizontal Scroll) */
+  #templateWrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tbl th, .tbl td { white-space: nowrap; padding: 8px; font-size: 12px; }
+
+  /* โซน Feed List */
+  .session-row { grid-template-columns: 60px 1fr 40px; gap: 10px; padding: 10px; border-radius: 8px; }
+  .stype { padding: 4px; font-size: 10px; }
+  .stemplate { font-size: 12px; }
+  .stime { display: none; /* ซ่อนเวลาบรรทัดล่างสุดไปก่อนบนมือถือ */ }
+  .sdur { font-size: 11px; }
+}
+
+/* สำหรับมือถือจอเล็กมากเช่น iPhone SE */
+@media (max-width: 375px) {
+  .toggle-btn { flex: 1 1 calc(50% - 6px); } /* ให้ปุ่ม Toggle แบ่งบรรทัดละ 2 แทน */
 }
 </style>
 </head>
@@ -181,7 +213,7 @@ select option { background: #0f172a; color: #fff; }
         <label class="filter-label">Media Type</label>
         <select class="filter-select" id="fMedia" onchange="setFilter('media',this.value)"></select>
       </div>
-      <button class="filter-reset" onclick="resetFilters()">Reset</button>
+      <button class="filter-reset" onclick="resetFilters()">Reset All</button>
     </div>
 
     <div class="toggle-bar">
@@ -240,7 +272,6 @@ let fDate = 'all', fEvent = 'all', fTemplate = 'all', fMedia = 'all';
 let donutChart = null, timelineChart = null;
 let prevListCount = 0;
 
-// ตั้งค่า Default สไตล์กราฟให้ล้ำๆ 
 Chart.defaults.color = '#94a3b8';
 Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
 Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
@@ -252,7 +283,7 @@ async function fetchCSV() {
   try {
     const purgeUrl = CSV_URL.replace('cdn.jsdelivr.net/gh', 'purge.jsdelivr.net/gh');
     await fetch(purgeUrl).catch(() => {});
-    const res = await fetch(CSV_URL + '?t=' + Date.now(), { cache: 'no-store' }); // ถอด headers Cache-Control ออกกันพัง
+    const res = await fetch(CSV_URL + '?t=' + Date.now(), { cache: 'no-store' }); 
     if (!res.ok) {
       setStatus(res.status === 404 ? 'ยังไม่มีข้อมูล' : `Error ${res.status}`); return;
     }
@@ -262,6 +293,7 @@ async function fetchCSV() {
     prevCount = parsed.length;
     allData = parsed;
     setStatus('');
+    // ซ่อนชื่อ Repo ออกตามที่เคยรีเควสไว้
     document.getElementById('fileName').textContent = `Live Data Connection`;
     document.getElementById('fileMeta').textContent = `Total Records: ${allData.length} | Last Sync: ${new Date().toLocaleTimeString('th-TH')}`;
     document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('th-TH');
@@ -399,7 +431,6 @@ function renderTimeline(d) {
   });
   const labels = Array.from({length:24},(_,i)=>String(i).padStart(2,'0')+':00');
   
-  // สร้าง Gradient สำหรับเส้นกราฟให้ดูล้ำ
   let gradPhoto = ctx.createLinearGradient(0, 0, 0, 300);
   gradPhoto.addColorStop(0, 'rgba(6, 182, 212, 0.4)'); gradPhoto.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
   let gradVideo = ctx.createLinearGradient(0, 0, 0, 300);
@@ -414,7 +445,7 @@ function renderTimeline(d) {
     interaction: { mode: 'index', intersect: false },
     plugins:{ legend:{ display: true, position: 'top', align: 'end', labels:{ color:'#e2e8f0', usePointStyle: true, boxWidth: 6 } } },
     scales:{
-      x:{ grid:{display:false}, ticks:{maxRotation:0, maxTicksLimit: 12} },
+      x:{ grid:{display:false}, ticks:{maxRotation:0, maxTicksLimit: 8} }, /* ลดป้ายแกน X ให้ไม่เบียดบนมือถือ */
       y:{ beginAtZero:true, border:{display:false} }
     }
   };
@@ -441,7 +472,7 @@ function renderTemplateTable(d) {
         <tr>
           <td style="color:#e2e8f0">${t}</td>
           <td style="font-size:16px; font-weight:700">${v.total}</td>
-          <td style="width:40%">
+          <td style="width:40%; min-width: 100px;">
             <div class="tbar"><div class="tbar-fill" style="width:${Math.round(v.total/max*100)}%;background:${colors[i%colors.length]};box-shadow: 0 0 10px ${colors[i%colors.length]}"></div></div>
           </td>
           <td>${v.qr}</td>
