@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booth Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --border: #2a2a3e;
+  --border2: #3a3a52;
+  --text: #e8e8f0;
+  --text2: #8888aa;
+  --text3: #555570;
+  --accent: #7c6af7;
+  --accent-bg: rgba(124,106,247,0.1);
+  --photo: #6af7c9;
+  --video: #a78bfa;
+  --abandoned: #f76a6a;
+  --radius: 8px;
+}
+body { font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: sticky; top: 0; z-index: 100; }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.logo { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+.live-pill { display: none; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; color: var(--photo); background: rgba(106,247,201,0.08); border: 1px solid rgba(106,247,201,0.25); padding: 2px 8px; border-radius: 20px; }
+.live-dot { width: 6px; height: 6px; background: var(--photo); border-radius: 50%; animation: blink 1.6s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.last-update { font-size: 11px; color: var(--text3); }
+.btn { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.12s; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: #6a58e5; border-color: #6a58e5; }
+.main { padding: 20px 24px; max-width: 1440px; margin: 0 auto; }
+.file-bar { display: flex; align-items: center; gap: 16px; padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; flex-wrap: wrap; }
+.file-name { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; }
+.file-meta { font-size: 11px; color: var(--text3); white-space: nowrap; }
+.status-msg { font-size: 11px; color: var(--abandoned); width: 100%; padding-top: 2px; }
+.filter-bar { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-label { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+.filter-select { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 28px 6px 10px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23555570' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; min-width: 140px; transition: border-color 0.12s; }
+.filter-select:hover { border-color: var(--accent); }
+.filter-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,106,247,0.15); }
+select option { background: #1a1a26; color: #e8e8f0; }
+.filter-reset { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); background: none; border: none; cursor: pointer; padding: 6px 4px; margin-bottom: 1px; transition: color 0.12s; }
+.filter-reset:hover { color: var(--accent); }
+.toggle-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.toggle-label { font-size: 11px; color: var(--text3); margin-right: 2px; }
+.toggle-btn { font-family: 'DM Mono', monospace; font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border2); background: var(--surface); color: var(--text3); cursor: pointer; transition: all 0.12s; }
+.toggle-btn.on { color: var(--text); }
+.toggle-btn.off { color: var(--text3); background: var(--bg); border-color: var(--border); text-decoration: line-through; opacity: 0.5; }
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+.metric-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+.metric-value { font-size: 24px; font-weight: 600; line-height: 1; color: var(--text); letter-spacing: -0.5px; }
+.metric-sub { font-size: 10px; color: var(--text3); margin-top: 4px; }
+.charts-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+.chart-card.hidden { display: none; }
+.chart-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+.chart-wrap { position: relative; height: 200px; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.tbl th { text-align: left; font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; padding: 0 8px 8px 0; }
+.tbl td { padding: 7px 8px 7px 0; border-top: 1px solid var(--border); color: var(--text2); }
+.tbl td:first-child { color: var(--text); font-weight: 500; }
+.tbar { height: 3px; background: #1a1a26; border-radius: 2px; overflow: hidden; margin-top: 3px; min-width: 60px; }
+.tbar-fill { height: 100%; border-radius: 2px; }
+.sessions-list { display: flex; flex-direction: column; gap: 4px; max-height: 280px; overflow-y: auto; }
+.session-row { display: grid; grid-template-columns: 72px 160px 1fr 54px; align-items: center; gap: 12px; padding: 7px 10px; border-radius: 6px; font-size: 11px; transition: background 0.1s; }
+.session-row:hover { background: var(--bg); }
+.stype { font-weight: 500; }
+.stype.Photo { color: var(--photo); }
+.stype.Video { color: var(--video); }
+.stype.Abandoned { color: var(--abandoned); }
+.stime { color: var(--text3); }
+.stemplate { color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sdur { color: var(--text3); text-align: right; }
+.new-tag { display: inline-block; font-size: 9px; font-weight: 600; color: var(--accent); background: var(--accent-bg); padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+.empty { display: flex; align-items: center; justify-content: center; height: 120px; color: var(--text3); font-size: 12px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+@media (max-width: 800px) {
+  .charts-2col { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .topbar { padding: 0 16px; }
+  .main { padding: 16px; }
+  .session-row { grid-template-columns: 64px 1fr 40px; }
+  .stime { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">Booth Dashboard</span>
+    <div class="live-pill" id="livePill"><div class="live-dot"></div> Live</div>
+  </div>
+  <div class="topbar-right">
+    <span class="last-update" id="lastUpdate"></span>
+    <button class="btn" id="intervalBtn" style="display:none" onclick="cycleInterval()">↻ 5s</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="file-bar">
+    <span class="file-name" id="fileName">กำลังเชื่อมต่อ...</span>
+    <span class="file-meta" id="fileMeta"></span>
+    <span class="status-msg" id="statusMsg"></span>
+  </div>
+
+  <div id="dashboard" style="display:none">
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label class="filter-label">วันที่</label>
+        <select class="filter-select" id="fDate" onchange="setFilter('date',this.value)"></select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Event</label>
+        <select class="filter-select" id="fEvent" onchange="setFilter('event',this.value)"></select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Template</label>
+        <select class="filter-select" id="fTemplate" onchange="setFilter('template',this.value)"></select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">ประเภทสื่อ</label>
+        <select class="filter-select" id="fMedia" onchange="setFilter('media',this.value)"></select>
+      </div>
+      <button class="filter-reset" onclick="resetFilters()">ล้างตัวกรอง</button>
+    </div>
+
+    <div class="toggle-bar">
+      <span class="toggle-label">แสดง:</span>
+      <button class="toggle-btn on" data-target="metricsWrap">ตัวเลขสรุป</button>
+      <button class="toggle-btn on" data-target="chartDonut">ประเภทสื่อ</button>
+      <button class="toggle-btn on" data-target="chartTimeline">Timeline</button>
+      <button class="toggle-btn on" data-target="chartTemplate">Templates</button>
+      <button class="toggle-btn on" data-target="chartActions">Saves / QR</button>
+      <button class="toggle-btn on" data-target="chartSessions">Sessions ล่าสุด</button>
+    </div>
+
+    <div class="metrics-grid" id="metricsWrap">
+      <div class="metric-card"><div class="metric-label">ทั้งหมด</div><div class="metric-value" id="mTotal">—</div><div class="metric-sub">sessions</div></div>
+      <div class="metric-card"><div class="metric-label">รูปภาพ</div><div class="metric-value" id="mPhoto" style="color:var(--photo)">—</div><div class="metric-sub" id="mPhotoSub"></div></div>
+      <div class="metric-card"><div class="metric-label">วิดีโอ</div><div class="metric-value" id="mVideo" style="color:var(--video)">—</div><div class="metric-sub" id="mVideoSub"></div></div>
+      <div class="metric-card"><div class="metric-label">ยกเลิก</div><div class="metric-value" id="mAbandoned" style="color:var(--abandoned)">—</div><div class="metric-sub" id="mAbandonSub"></div></div>
+      <div class="metric-card"><div class="metric-label">Completion Rate</div><div class="metric-value" id="mRate">—</div><div class="metric-sub">% สำเร็จ</div></div>
+      <div class="metric-card"><div class="metric-label">QR Scans</div><div class="metric-value" id="mQR">—</div><div class="metric-sub" id="mQRSub"></div></div>
+      <div class="metric-card"><div class="metric-label">บันทึกลงเครื่อง</div><div class="metric-value" id="mSaved">—</div><div class="metric-sub">saved to device</div></div>
+      <div class="metric-card"><div class="metric-label">เฉลี่ย / Session</div><div class="metric-value" id="mAvg">—</div><div class="metric-sub">วินาที (เฉพาะสำเร็จ)</div></div>
+    </div>
+
+    <div class="charts-2col">
+      <div class="chart-card" id="chartDonut"><div class="chart-title">ประเภทสื่อ</div><div class="chart-wrap"><canvas id="donutChart"></canvas></div></div>
+      <div class="chart-card" id="chartTimeline"><div class="chart-title">Activity รายชั่วโมง</div><div class="chart-wrap"><canvas id="timelineChart"></canvas></div></div>
+    </div>
+    <div class="charts-2col" style="margin-bottom:12px">
+      <div class="chart-card" id="chartTemplate"><div class="chart-title">Sessions ตาม Template</div><div id="templateWrap" style="overflow:auto;min-height:200px"></div></div>
+      <div class="chart-card" id="chartActions"><div class="chart-title">Saves vs QR Scans</div><div class="chart-wrap"><canvas id="actionsChart"></canvas></div></div>
+    </div>
+    <div class="chart-card" id="chartSessions" style="margin-bottom:24px">
+      <div class="chart-title">Sessions ล่าสุด</div>
+      <div class="sessions-list" id="sessionsList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+// แก้ 2 บรรทัดนี้ให้ตรงกับ GitHub repo ของคุณ
+const GH_OWNER  = 'YOUR_GITHUB_USERNAME'; // เช่น 'john-doe'
+const GH_REPO   = 'booth-dashboard';       // ชื่อ repo
+const CSV_URL   = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/data/booth_stats.csv`;
+const REFRESH_SEC = 10;
+
+// ── STATE ───────────────────────────────────────────────────
+let allData = [], prevCount = 0, refreshSec = REFRESH_SEC, refreshTimer = null;
+let fDate = 'all', fEvent = 'all', fTemplate = 'all', fMedia = 'all';
+let donutChart = null, timelineChart = null, actionsChart = null;
+let prevListCount = 0;
+
+// ── INIT ────────────────────────────────────────────────────
+async function init() {
+  await fetchCSV();
+  startLive();
+}
+
+async function fetchCSV() {
+  try {
+    // cache-bust ด้วย timestamp ป้องกัน browser cache ไฟล์เก่า
+    const res = await fetch(CSV_URL + '?t=' + Date.now(), {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache' },
+    });
+    if (!res.ok) {
+      setStatus(res.status === 404
+        ? 'ยังไม่มีข้อมูล — รอ upload.js อัปโหลดครั้งแรก'
+        : `Error ${res.status} — ตรวจสอบ GH_OWNER / GH_REPO ใน index.html`);
+      return;
+    }
+    const text = await res.text();
+    const parsed = parseCSV(text);
+    const isNew = parsed.length !== prevCount;
+    prevCount = parsed.length;
+    allData = parsed;
+    setStatus('');
+    document.getElementById('fileName').textContent = `${GH_OWNER}/${GH_REPO}`;
+    document.getElementById('fileMeta').textContent =
+      `${allData.length} rows · อัปเดต ${new Date().toLocaleTimeString('th-TH')}`;
+    document.getElementById('lastUpdate').textContent =
+      new Date().toLocaleTimeString('th-TH');
+    document.getElementById('dashboard').style.display = 'block';
+    syncDropdowns();
+    render(isNew);
+  } catch (err) {
+    setStatus('เชื่อมต่อไม่ได้: ' + err.message);
+  }
+}
+
+function startLive() {
+  clearInterval(refreshTimer);
+  refreshTimer = setInterval(fetchCSV, refreshSec * 1000);
+  document.getElementById('livePill').style.display = 'flex';
+  const btn = document.getElementById('intervalBtn');
+  btn.style.display = 'block';
+  btn.textContent = `↻ ${refreshSec}s`;
+}
+
+function cycleInterval() {
+  const opts = [5, 10, 30, 60];
+  refreshSec = opts[(opts.indexOf(refreshSec) + 1) % opts.length];
+  clearInterval(refreshTimer);
+  refreshTimer = setInterval(fetchCSV, refreshSec * 1000);
+  document.getElementById('intervalBtn').textContent = `↻ ${refreshSec}s`;
+}
+
+function setStatus(msg) {
+  document.getElementById('statusMsg').textContent = msg;
+}
+
+// ── CSV PARSE ────────────────────────────────────────────────
+function parseLine(line) {
+  const res = []; let cur = '', inQ = false;
+  for (const c of line) {
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
+    else cur += c;
+  }
+  res.push(cur);
+  return res;
+}
+
+function parseCSV(text) {
+  const lines = text.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const hdr = parseLine(lines[0]).map(h => h.trim());
+  return lines.slice(1).map(l => {
+    const v = parseLine(l);
+    const o = {};
+    hdr.forEach((h, i) => o[h] = (v[i] || '').replace(/^"|"$/g, '').trim());
+    return o;
+  }).filter(r => r.Session);
+}
+
+// ── DROPDOWNS ────────────────────────────────────────────────
+function uniq(arr) { return [...new Set(arr)].filter(Boolean).sort(); }
+
+function fillSelect(id, values, current) {
+  const sel = document.getElementById(id);
+  sel.innerHTML = `<option value="all">ทั้งหมด</option>` +
+    values.map(v => `<option value="${v}" ${v === current ? 'selected' : ''}>${v}</option>`).join('');
+  if (current !== 'all' && values.includes(current)) sel.value = current;
+}
+
+function syncDropdowns() {
+  fillSelect('fDate',     uniq(allData.map(s => s.Date)),       fDate);
+  fillSelect('fEvent',    uniq(allData.map(s => s.EventName)),  fEvent);
+  fillSelect('fTemplate', uniq(allData.map(s => s.LayersUsed)), fTemplate);
+  fillSelect('fMedia',    uniq(allData.map(s => s.MediaType)),  fMedia);
+}
+
+function setFilter(type, val) {
+  if (type === 'date')     fDate     = val;
+  if (type === 'event')    fEvent    = val;
+  if (type === 'template') fTemplate = val;
+  if (type === 'media')    fMedia    = val;
+  render(false);
+}
+
+function resetFilters() {
+  fDate = fEvent = fTemplate = fMedia = 'all';
+  syncDropdowns();
+  render(false);
+}
+
+function filtered() {
+  return allData.filter(s =>
+    (fDate     === 'all' || s.Date       === fDate)     &&
+    (fEvent    === 'all' || s.EventName  === fEvent)    &&
+    (fTemplate === 'all' || s.LayersUsed === fTemplate) &&
+    (fMedia    === 'all' || s.MediaType  === fMedia)
+  );
+}
+
+// ── RENDER ───────────────────────────────────────────────────
+function render(flash) {
+  const d = filtered();
+  const photos    = d.filter(s => s.MediaType === 'Photo');
+  const videos    = d.filter(s => s.MediaType === 'Video');
+  const abandoned = d.filter(s => s.MediaType === 'Abandoned');
+  const completed = [...photos, ...videos];
+  const total = d.length;
+  const qr    = d.reduce((a, s) => a + (parseInt(s.QR_Scans)       || 0), 0);
+  const saved = d.reduce((a, s) => a + (parseInt(s.SavedToDevice)  || 0), 0);
+  const avgDur = completed.length
+    ? completed.reduce((a, s) => a + (parseFloat(s['Duration(sec)']) || 0), 0) / completed.length
+    : 0;
+  const rate = total ? Math.round(completed.length / total * 100) : 0;
+  const pct = n => total ? `${Math.round(n / total * 100)}%` : '0%';
+
+  document.getElementById('mTotal').textContent     = total;
+  document.getElementById('mPhoto').textContent     = photos.length;
+  document.getElementById('mPhotoSub').textContent  = pct(photos.length);
+  document.getElementById('mVideo').textContent     = videos.length;
+  document.getElementById('mVideoSub').textContent  = pct(videos.length);
+  document.getElementById('mAbandoned').textContent = abandoned.length;
+  document.getElementById('mAbandonSub').textContent= pct(abandoned.length);
+  document.getElementById('mRate').textContent      = rate + '%';
+  document.getElementById('mQR').textContent        = qr;
+  document.getElementById('mQRSub').textContent     = `avg ${completed.length ? (qr/completed.length).toFixed(1) : '0'}/session`;
+  document.getElementById('mSaved').textContent     = saved;
+  document.getElementById('mAvg').textContent       = avgDur.toFixed(1) + 's';
+
+  renderDonut(photos.length, videos.length, abandoned.length);
+  renderTimeline(d);
+  renderTemplateTable(d);
+  renderActions(d);
+  renderSessions(d, flash);
+}
+
+function renderDonut(p, v, a) {
+  const ctx  = document.getElementById('donutChart').getContext('2d');
+  const data = { labels: ['Photo','Video','Abandoned'], datasets: [{ data:[p,v,a], backgroundColor:['#6af7c9','#a78bfa','#f76a6a'], borderWidth:0, hoverOffset:4 }] };
+  const opts = { responsive:true, maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{ position:'right', labels:{ color:'#8888aa', font:{family:'DM Mono',size:11}, padding:14, boxWidth:9, boxHeight:9 } } } };
+  if (donutChart) { Object.assign(donutChart.data, data); donutChart.update('none'); }
+  else donutChart = new Chart(ctx, { type:'doughnut', data, options:opts });
+}
+
+function renderTimeline(d) {
+  const H  = () => Object.fromEntries(Array.from({length:24},(_,i)=>[i,0]));
+  const ph = H(), vi = H(), ab = H();
+  d.forEach(s => {
+    const h = parseInt((s.Time||'0').split(':')[0]);
+    if (s.MediaType==='Photo') ph[h]++;
+    else if (s.MediaType==='Video') vi[h]++;
+    else if (s.MediaType==='Abandoned') ab[h]++;
+  });
+  const labels = Array.from({length:24},(_,i)=>i+'h');
+  const ds = [
+    { label:'Photo',     data:Object.values(ph), backgroundColor:'rgba(106,247,201,0.7)', borderRadius:2 },
+    { label:'Video',     data:Object.values(vi), backgroundColor:'rgba(167,139,250,0.7)', borderRadius:2 },
+    { label:'Abandoned', data:Object.values(ab), backgroundColor:'rgba(247,106,106,0.35)', borderRadius:2 },
+  ];
+  const opts = {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{ color:'#8888aa', font:{family:'DM Mono',size:10}, boxWidth:8, padding:12 } } },
+    scales:{
+      x:{ stacked:true, grid:{display:false}, ticks:{color:'#555570',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:12} },
+      y:{ stacked:true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#555570',font:{size:10}} }
+    }
+  };
+  if (timelineChart) { timelineChart.data.datasets.forEach((s,i)=>s.data=ds[i].data); timelineChart.update('none'); }
+  else timelineChart = new Chart(document.getElementById('timelineChart').getContext('2d'),{type:'bar',data:{labels,datasets:ds},options:opts});
+}
+
+function renderTemplateTable(d) {
+  const map = {};
+  d.forEach(s => {
+    const t = s.LayersUsed || 'Unknown';
+    if (!map[t]) map[t] = { total:0, photo:0, video:0, abandoned:0, qr:0 };
+    map[t].total++; map[t].qr += parseInt(s.QR_Scans)||0;
+    if (s.MediaType==='Photo') map[t].photo++;
+    else if (s.MediaType==='Video') map[t].video++;
+    else if (s.MediaType==='Abandoned') map[t].abandoned++;
+  });
+  const rows = Object.entries(map).sort((a,b)=>b[1].total-a[1].total);
+  const max = rows[0]?.[1].total || 1;
+  const colors = ['#7c6af7','#6af7c9','#a78bfa','#f7c96a','#f76a6a','#6af7f7','#f7a06a'];
+  document.getElementById('templateWrap').innerHTML = `
+    <table class="tbl">
+      <thead><tr><th>Template</th><th>ทั้งหมด</th><th>Photo</th><th>Video</th><th>ยกเลิก</th><th>QR</th></tr></thead>
+      <tbody>${rows.map(([t,v],i)=>`
+        <tr>
+          <td>${t}</td>
+          <td><span style="color:${colors[i%colors.length]};font-weight:600">${v.total}</span>
+            <div class="tbar"><div class="tbar-fill" style="width:${Math.round(v.total/max*100)}%;background:${colors[i%colors.length]}"></div></div>
+          </td>
+          <td style="color:var(--photo)">${v.photo}</td>
+          <td style="color:var(--video)">${v.video}</td>
+          <td style="color:var(--abandoned)">${v.abandoned}</td>
+          <td>${v.qr}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderActions(d) {
+  const sv = Object.fromEntries(Array.from({length:24},(_,i)=>[i,0]));
+  const qr = Object.fromEntries(Array.from({length:24},(_,i)=>[i,0]));
+  d.filter(s=>s.MediaType!=='Abandoned').forEach(s=>{
+    const h = parseInt((s.Time||'0').split(':')[0]);
+    sv[h] += parseInt(s.SavedToDevice)||0;
+    qr[h] += parseInt(s.QR_Scans)||0;
+  });
+  const labels = Array.from({length:24},(_,i)=>i+'h');
+  const ds = [
+    { label:'Saved',    data:Object.values(sv), backgroundColor:'rgba(247,160,106,0.7)', borderRadius:2 },
+    { label:'QR Scans', data:Object.values(qr), backgroundColor:'rgba(106,247,201,0.6)', borderRadius:2 },
+  ];
+  const opts = {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{ color:'#8888aa', font:{family:'DM Mono',size:10}, boxWidth:8, padding:12 } } },
+    scales:{
+      x:{ grid:{display:false}, ticks:{color:'#555570',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:12} },
+      y:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#555570',font:{size:10}} }
+    }
+  };
+  if (actionsChart) { actionsChart.data.datasets.forEach((s,i)=>s.data=ds[i].data); actionsChart.update('none'); }
+  else actionsChart = new Chart(document.getElementById('actionsChart').getContext('2d'),{type:'bar',data:{labels,datasets:ds},options:opts});
+}
+
+function renderSessions(d, flash) {
+  const recent = [...d].reverse().slice(0, 40);
+  const newCount = flash ? d.length - prevListCount : 0;
+  if (flash) prevListCount = d.length;
+  document.getElementById('sessionsList').innerHTML = recent.length === 0
+    ? '<div class="empty">ไม่มีข้อมูล</div>'
+    : recent.map((s, i) => `
+      <div class="session-row">
+        <span class="stype ${s.MediaType}">${s.MediaType}${i < newCount ? '<span class="new-tag">NEW</span>' : ''}</span>
+        <span class="stime">${s.Date} ${s.Time}</span>
+        <span class="stemplate">${s.LayersUsed||'—'} · ${s.EventName}</span>
+        <span class="sdur">${parseFloat(s['Duration(sec)']).toFixed(1)}s</span>
+      </div>`).join('');
+}
+
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.onclick = () => {
+    const isOn = btn.classList.contains('on');
+    btn.classList.toggle('on', !isOn);
+    btn.classList.toggle('off', isOn);
+    const el = document.getElementById(btn.dataset.target);
+    if (el) el.classList.toggle('hidden', isOn);
+  };
+});
+
+Chart.defaults.color = '#8888aa';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+
+// Start!
+init();
+</script>
+</body>
+</html>
