@@ -262,7 +262,7 @@ async function fetchCSV() {
     prevCount = parsed.length;
     allData = parsed;
     setStatus('');
-    document.getElementById('fileName').textContent = `Repository: ${GH_OWNER}/${GH_REPO}`;
+    document.getElementById('fileName').textContent = `Live Data Connection`;
     document.getElementById('fileMeta').textContent = `Total Records: ${allData.length} | Last Sync: ${new Date().toLocaleTimeString('th-TH')}`;
     document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('th-TH');
     document.getElementById('dashboard').style.display = 'block';
