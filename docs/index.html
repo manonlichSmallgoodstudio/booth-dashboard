@@ -264,7 +264,8 @@ select option { background: #0f172a; color: #fff; }
 // ── CONFIG ──────────────────────────────────────────────────
 const GH_OWNER  = 'manonlichSmallgoodstudio'; 
 const GH_REPO   = 'booth-dashboard';       
-const CSV_URL   = `https://cdn.jsdelivr.net/gh/${GH_OWNER}/${GH_REPO}@main/data/booth_stats.csv`;
+// ใช้ลิงก์ raw.githubusercontent.com แทน
+const CSV_URL = 'https://raw.githubusercontent.com/manonlichSmallgoodstudio/booth-dashboard/main/data/booth_stats.csv';
 const REFRESH_SEC = 10;
 
 let allData = [], prevCount = 0, refreshSec = REFRESH_SEC, refreshTimer = null;
