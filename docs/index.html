@@ -178,7 +178,8 @@ select option { background: #1a1a26; color: #e8e8f0; }
 // แก้ 2 บรรทัดนี้ให้ตรงกับ GitHub repo ของคุณ
 const GH_OWNER  = 'manonlichSmallgoodstudio'; // เช่น 'john-doe'
 const GH_REPO   = 'booth-dashboard';       // ชื่อ repo
-const CSV_URL   = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/data/booth_stats.csv`;
+// jsDelivr ครอบ GitHub และรองรับ CORS ถูกต้อง — ใช้แทน raw.githubusercontent.com
+  const CSV_URL   = `https://cdn.jsdelivr.net/gh/${GH_OWNER}/${GH_REPO}@main/data/booth_stats.csv`;
 const REFRESH_SEC = 10;
 
 // ── STATE ───────────────────────────────────────────────────
@@ -196,6 +197,9 @@ async function init() {
 async function fetchCSV() {
   try {
     // cache-bust ด้วย timestamp ป้องกัน browser cache ไฟล์เก่า
+    // jsDelivr มี cache — ใช้ purge API เพื่อดึงข้อมูลใหม่เสมอ
+    const purgeUrl = CSV_URL.replace('cdn.jsdelivr.net/gh', 'purge.jsdelivr.net/gh');
+    await fetch(purgeUrl).catch(() => {});
     const res = await fetch(CSV_URL + '?t=' + Date.now(), {
       cache: 'no-store',
       headers: { 'Cache-Control': 'no-cache' },
