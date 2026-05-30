@@ -1,513 +1,1057 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Booth Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg-color: #060b19;
-  --surface: rgba(16, 24, 46, 0.6);
-  --surface-hover: rgba(23, 33, 59, 0.8);
-  --border: rgba(255, 255, 255, 0.05);
-  --border2: rgba(255, 255, 255, 0.1);
-  --text: #ffffff;
-  --text2: #94a3b8;
-  --text3: #64748b;
-  --accent: #3b82f6;
-  --accent-bg: rgba(59, 130, 246, 0.15);
-  --photo: #06b6d4;
-  --video: #8b5cf6;
-  --abandoned: #f43f5e;
-  --radius: 16px;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booth Dashboard</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
 
-body { 
-  font-family: 'Plus Jakarta Sans', sans-serif; 
-  background-color: var(--bg-color);
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
-  color: var(--text); 
-  font-size: 13px; 
-  line-height: 1.5; 
-  -webkit-font-smoothing: antialiased; 
-  min-height: 100vh;
-}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-.glass-panel {
-  background: var(--surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
+        :root {
+            --bg-color: #060b19;
+            --surface: rgba(16, 24, 46, 0.6);
+            --surface-hover: rgba(23, 33, 59, 0.8);
+            --border: rgba(255, 255, 255, 0.05);
+            --border2: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text2: #94a3b8;
+            --text3: #64748b;
+            --accent: #3b82f6;
+            --accent-bg: rgba(59, 130, 246, 0.15);
+            --photo: #06b6d4;
+            --video: #8b5cf6;
+            --abandoned: #f43f5e;
+            --shared: #ec4899; /* เพิ่มสีสำหรับการ์ด Share */
+            --radius: 16px;
+        }
 
-.topbar { background: rgba(6, 11, 25, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: sticky; top: 0; z-index: 100; }
-.topbar-left { display: flex; align-items: center; gap: 12px; }
-.logo { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
-.live-pill { display: none; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #10b981; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 12px; border-radius: 20px; }
-.live-dot { width: 6px; height: 6px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: blink 1.5s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.topbar-right { display: flex; align-items: center; gap: 12px; }
-.last-update { font-size: 12px; color: var(--text3); }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%), radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
 
-.btn { font-family: inherit; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border2); background: rgba(255,255,255,0.03); color: var(--text); cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-.btn:hover { border-color: var(--accent); color: #fff; background: var(--accent); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .glass-panel {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
-.main { padding: 24px; max-width: 1440px; margin: 0 auto; }
+        .topbar {
+            background: rgba(6, 11, 25, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-.file-bar { display: flex; align-items: center; gap: 16px; padding: 12px 20px; margin-bottom: 24px; flex-wrap: wrap; }
-.file-name { font-size: 13px; font-weight: 600; color: var(--photo); flex: 1; }
-.file-meta { font-size: 12px; color: var(--text2); white-space: nowrap; }
-.status-msg { font-size: 12px; color: var(--abandoned); width: 100%; padding-top: 4px; }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-.filter-bar { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-.filter-group { display: flex; flex-direction: column; gap: 6px; }
-.filter-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
-.filter-select { font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text); background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 32px 8px 12px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; min-width: 150px; transition: all 0.2s; }
-.filter-select:hover, .filter-select:focus { border-color: var(--accent); outline: none; background-color: rgba(59,130,246,0.05); }
-select option { background: #0f172a; color: #fff; }
-.filter-reset { font-family: inherit; font-size: 12px; font-weight: 600; color: var(--text3); background: none; border: none; cursor: pointer; padding: 8px 4px; margin-bottom: 1px; transition: color 0.2s; }
-.filter-reset:hover { color: var(--abandoned); }
+        .logo {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.2px;
+        }
 
-.toggle-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-.toggle-label { font-size: 12px; font-weight: 500; color: var(--text3); margin-right: 4px; }
-.toggle-btn { font-family: inherit; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.2s; }
-.toggle-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); }
-.toggle-btn.off { opacity: 0.4; }
+        .live-pill {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
 
-.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.metric-card { padding: 20px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-.metric-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--border2), transparent); }
-.metric-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
-.metric-value { font-size: 32px; font-weight: 700; line-height: 1; color: var(--text); letter-spacing: -1px; }
-.metric-sub { font-size: 11px; font-weight: 500; color: var(--text3); margin-top: 8px; display: flex; align-items: center; gap: 4px; }
-.trend-up { color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px; }
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: blink 1.5s infinite;
+        }
 
-.charts-2col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
-.chart-card { padding: 24px; }
-.chart-card.hidden { display: none; }
-.chart-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
-.chart-wrap { position: relative; height: 280px; width: 100%; }
+        @keyframes blink {
+            0%,100% {
+                opacity: 1
+            }
 
-.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
-.tbl th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 12px 12px 12px; border-bottom: 1px solid var(--border); }
-.tbl td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.02); color: var(--text2); font-weight: 500; }
-.tbl tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
-.tbl td:first-child { color: var(--text); font-weight: 600; }
-.tbar { height: 4px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; margin-top: 6px; min-width: 80px; }
-.tbar-fill { height: 100%; border-radius: 4px; }
+            50% {
+                opacity: 0.3
+            }
+        }
 
-.sessions-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; padding-right: 8px; }
-.session-row { display: grid; grid-template-columns: 80px 140px 1fr 60px; align-items: center; gap: 16px; padding: 12px 16px; border-radius: 12px; font-size: 13px; background: rgba(0,0,0,0.2); border: 1px solid transparent; transition: all 0.2s; }
-.session-row:hover { background: var(--surface-hover); border-color: var(--border2); transform: translateY(-1px); }
-.stype { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 8px; border-radius: 6px; text-align: center; }
-.stype.Photo { color: var(--photo); background: rgba(6, 182, 212, 0.1); }
-.stype.Video { color: var(--video); background: rgba(139, 92, 246, 0.1); }
-.stype.Abandoned { color: var(--abandoned); background: rgba(244, 63, 94, 0.1); }
-.stime { color: var(--text3); font-size: 12px; }
-.stemplate { color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sdur { color: var(--text3); text-align: right; font-family: 'DM Mono', monospace; }
-.new-tag { display: inline-block; font-size: 9px; font-weight: 700; color: #fff; background: var(--accent); padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; box-shadow: 0 0 8px rgba(59,130,246,0.5); }
-.empty { display: flex; align-items: center; justify-content: center; height: 120px; color: var(--text3); font-size: 13px; font-weight: 500; }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        .last-update {
+            font-size: 12px;
+            color: var(--text3);
+        }
 
-/* 📱 Responsive สำหรับ iPad/Tablet */
-@media (max-width: 1024px) {
-  .charts-2col { grid-template-columns: 1fr; }
-}
+        .btn {
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border2);
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
 
-/* 📱 Responsive สำหรับ Mobile มือถือ */
-@media (max-width: 768px) {
-  .topbar { padding: 12px 16px; height: auto; min-height: 56px; flex-wrap: wrap; }
-  .logo { font-size: 14px; }
-  .last-update { display: none; /* ซ่อนเวลาโหลดบนมือถือเพื่อประหยัดที่ */ }
-  .main { padding: 12px; }
-  
-  /* ลดขนาด Padding การ์ดด้านบน และจัดเป็น 2 คอลัมน์แบบเต็มจอ */
-  .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-  .metric-card { padding: 12px; border-radius: 12px; }
-  .metric-label { font-size: 11px; margin-bottom: 4px; }
-  .metric-value { font-size: 24px; }
-  .metric-sub { font-size: 9px; margin-top: 4px; }
+            .btn:hover {
+                border-color: var(--accent);
+                color: #fff;
+                background: var(--accent);
+                box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            }
 
-  /* จัดเรียงแถบ Filter ให้เป็น 2 คอลัมน์ และปุ่มเต็มบรรทัด */
-  .filter-bar { gap: 10px; padding: 12px; margin-bottom: 16px; justify-content: space-between; border-radius: 12px; }
-  .filter-group { flex: 1 1 calc(50% - 5px); }
-  .filter-select { min-width: 0; width: 100%; font-size: 12px; padding: 8px 24px 8px 8px; background-position: right 8px center; }
-  .filter-reset { flex: 1 1 100%; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; margin-top: 4px; font-size: 13px; }
+        .main {
+            padding: 24px;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
 
-  /* ปุ่ม Toggle สลับมุมมองจัดใหม่ให้กดง่าย */
-  .toggle-bar { justify-content: flex-start; margin-bottom: 16px; gap: 6px; }
-  .toggle-label { width: 100%; margin-bottom: 4px; font-size: 11px; }
-  .toggle-btn { flex: 1 1 calc(33.33% - 6px); padding: 8px 6px; font-size: 11px; text-align: center; justify-content: center; }
+        .file-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 20px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
 
-  /* โซนกราฟ ลดความสูงลงมานิดหน่อยไม่ให้กินที่ */
-  .chart-card { padding: 16px 12px; border-radius: 12px; }
-  .chart-wrap { height: 220px; }
-  .chart-title { font-size: 13px; margin-bottom: 12px; }
-  
-  /* ทำให้ตารางสถิติ Template ปัดซ้าย-ขวาได้ (Horizontal Scroll) */
-  #templateWrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .tbl th, .tbl td { white-space: nowrap; padding: 8px; font-size: 12px; }
+        .file-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--photo);
+            flex: 1;
+        }
 
-  /* โซน Feed List */
-  .session-row { grid-template-columns: 60px 1fr 40px; gap: 10px; padding: 10px; border-radius: 8px; }
-  .stype { padding: 4px; font-size: 10px; }
-  .stemplate { font-size: 12px; }
-  .stime { display: none; /* ซ่อนเวลาบรรทัดล่างสุดไปก่อนบนมือถือ */ }
-  .sdur { font-size: 11px; }
-}
+        .file-meta {
+            font-size: 12px;
+            color: var(--text2);
+            white-space: nowrap;
+        }
 
-/* สำหรับมือถือจอเล็กมากเช่น iPhone SE */
-@media (max-width: 375px) {
-  .toggle-btn { flex: 1 1 calc(50% - 6px); } /* ให้ปุ่ม Toggle แบ่งบรรทัดละ 2 แทน */
-}
-</style>
+        .status-msg {
+            font-size: 12px;
+            color: var(--abandoned);
+            width: 100%;
+            padding-top: 4px;
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-select {
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 32px 8px 12px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            min-width: 150px;
+            transition: all 0.2s;
+        }
+
+            .filter-select:hover, .filter-select:focus {
+                border-color: var(--accent);
+                outline: none;
+                background-color: rgba(59,130,246,0.05);
+            }
+
+        select option {
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .filter-reset {
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text3);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 4px;
+            margin-bottom: 1px;
+            transition: color 0.2s;
+        }
+
+            .filter-reset:hover {
+                color: var(--abandoned);
+            }
+
+        .toggle-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text3);
+            margin-right: 4px;
+        }
+
+        .toggle-btn {
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text2);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .toggle-btn.on {
+                background: var(--accent);
+                color: #fff;
+                border-color: var(--accent);
+                box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+            }
+
+            .toggle-btn.off {
+                opacity: 0.4;
+            }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .metric-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, var(--border2), transparent);
+            }
+
+        .metric-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text2);
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text);
+            letter-spacing: -1px;
+        }
+
+        .metric-sub {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text3);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .trend-up {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .charts-2col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .chart-card {
+            padding: 24px;
+        }
+
+            .chart-card.hidden {
+                display: none;
+            }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+            .tbl th {
+                text-align: left;
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--text3);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 0 12px 12px 12px;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .tbl td {
+                padding: 12px;
+                border-bottom: 1px solid rgba(255,255,255,0.02);
+                color: var(--text2);
+                font-weight: 500;
+            }
+
+            .tbl tr:hover td {
+                background: rgba(255,255,255,0.02);
+                color: var(--text);
+            }
+
+            .tbl td:first-child {
+                color: var(--text);
+                font-weight: 600;
+            }
+
+        .tbar {
+            height: 4px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+            min-width: 80px;
+        }
+
+        .tbar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .sessions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .session-row {
+            display: grid;
+            grid-template-columns: 80px 140px 1fr 60px;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+            .session-row:hover {
+                background: var(--surface-hover);
+                border-color: var(--border2);
+                transform: translateY(-1px);
+            }
+
+        .stype {
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+            .stype.Photo {
+                color: var(--photo);
+                background: rgba(6, 182, 212, 0.1);
+            }
+
+            .stype.Video {
+                color: var(--video);
+                background: rgba(139, 92, 246, 0.1);
+            }
+
+            .stype.Abandoned {
+                color: var(--abandoned);
+                background: rgba(244, 63, 94, 0.1);
+            }
+
+        .stime {
+            color: var(--text3);
+            font-size: 12px;
+        }
+
+        .stemplate {
+            color: var(--text);
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sdur {
+            color: var(--text3);
+            text-align: right;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .new-tag {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+            box-shadow: 0 0 8px rgba(59,130,246,0.5);
+        }
+
+        .empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 120px;
+            color: var(--text3);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.2);
+            }
+
+        /* 📱 Responsive สำหรับ iPad/Tablet */
+        @media (max-width: 1024px) {
+            .charts-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 📱 Responsive สำหรับ Mobile มือถือ */
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 12px 16px;
+                height: auto;
+                min-height: 56px;
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                font-size: 14px;
+            }
+
+            .last-update {
+                display: none;
+            }
+
+            .main {
+                padding: 12px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+
+            .metric-card {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .metric-label {
+                font-size: 11px;
+                margin-bottom: 4px;
+            }
+
+            .metric-value {
+                font-size: 24px;
+            }
+
+            .metric-sub {
+                font-size: 9px;
+                margin-top: 4px;
+            }
+
+            .filter-bar {
+                gap: 10px;
+                padding: 12px;
+                margin-bottom: 16px;
+                justify-content: space-between;
+                border-radius: 12px;
+            }
+
+            .filter-group {
+                flex: 1 1 calc(50% - 5px);
+            }
+
+            .filter-select {
+                min-width: 0;
+                width: 100%;
+                font-size: 12px;
+                padding: 8px 24px 8px 8px;
+                background-position: right 8px center;
+            }
+
+            .filter-reset {
+                flex: 1 1 100%;
+                background: rgba(255,255,255,0.05);
+                border-radius: 8px;
+                padding: 10px;
+                margin-top: 4px;
+                font-size: 13px;
+            }
+
+            .toggle-bar {
+                justify-content: flex-start;
+                margin-bottom: 16px;
+                gap: 6px;
+            }
+
+            .toggle-label {
+                width: 100%;
+                margin-bottom: 4px;
+                font-size: 11px;
+            }
+
+            .toggle-btn {
+                flex: 1 1 calc(33.33% - 6px);
+                padding: 8px 6px;
+                font-size: 11px;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .chart-card {
+                padding: 16px 12px;
+                border-radius: 12px;
+            }
+
+            .chart-wrap {
+                height: 220px;
+            }
+
+            .chart-title {
+                font-size: 13px;
+                margin-bottom: 12px;
+            }
+
+            #templateWrap {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .tbl th, .tbl td {
+                white-space: nowrap;
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .session-row {
+                grid-template-columns: 60px 1fr 40px;
+                gap: 10px;
+                padding: 10px;
+                border-radius: 8px;
+            }
+
+            .stype {
+                padding: 4px;
+                font-size: 10px;
+            }
+
+            .stemplate {
+                font-size: 12px;
+            }
+
+            .stime {
+                display: none;
+            }
+
+            .sdur {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .toggle-btn {
+                flex: 1 1 calc(50% - 6px);
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-left">
-    <span class="logo">Booth Interactive Monitor</span>
-    <div class="live-pill" id="livePill"><div class="live-dot"></div> SYNCING</div>
-  </div>
-  <div class="topbar-right">
-    <span class="last-update" id="lastUpdate"></span>
-    <button class="btn" id="intervalBtn" style="display:none" onclick="cycleInterval()">↻ 5s</button>
-  </div>
-</div>
-
-<div class="main">
-  <div class="file-bar glass-panel">
-    <span class="file-name" id="fileName">กำลังเชื่อมต่อฐานข้อมูล...</span>
-    <span class="file-meta" id="fileMeta"></span>
-    <span class="status-msg" id="statusMsg"></span>
-  </div>
-
-  <div id="dashboard" style="display:none">
-    
-    <div class="filter-bar">
-      <div class="filter-group">
-        <label class="filter-label">Date</label>
-        <select class="filter-select" id="fDate" onchange="setFilter('date',this.value)"></select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Event</label>
-        <select class="filter-select" id="fEvent" onchange="setFilter('event',this.value)"></select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Template</label>
-        <select class="filter-select" id="fTemplate" onchange="setFilter('template',this.value)"></select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Media Type</label>
-        <select class="filter-select" id="fMedia" onchange="setFilter('media',this.value)"></select>
-      </div>
-      <button class="filter-reset" onclick="resetFilters()">Reset All</button>
+    <div class="topbar">
+        <div class="topbar-left">
+            <span class="logo">Booth Interactive Monitor</span>
+            <div class="live-pill" id="livePill"><div class="live-dot"></div> SYNCING</div>
+        </div>
+        <div class="topbar-right">
+            <span class="last-update" id="lastUpdate"></span>
+            <button class="btn" id="intervalBtn" style="display:none" onclick="cycleInterval()">↻ 5s</button>
+        </div>
     </div>
 
-    <div class="toggle-bar">
-      <span class="toggle-label">Views:</span>
-      <button class="toggle-btn on" data-target="metricsWrap">Overview</button>
-      <button class="toggle-btn on" data-target="chartDonut">Media Type</button>
-      <button class="toggle-btn on" data-target="chartTimeline">Timeline</button>
-      <button class="toggle-btn on" data-target="chartTemplate">Performance</button>
-      <button class="toggle-btn on" data-target="chartSessions">Recent Feed</button>
+    <div class="main">
+        <div class="file-bar glass-panel">
+            <span class="file-name" id="fileName">กำลังเชื่อมต่อฐานข้อมูล...</span>
+            <span class="file-meta" id="fileMeta"></span>
+            <span class="status-msg" id="statusMsg"></span>
+        </div>
+
+        <div id="dashboard" style="display:none">
+
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label class="filter-label">Date</label>
+                    <select class="filter-select" id="fDate" onchange="setFilter('date',this.value)"></select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Event</label>
+                    <select class="filter-select" id="fEvent" onchange="setFilter('event',this.value)"></select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Template</label>
+                    <select class="filter-select" id="fTemplate" onchange="setFilter('template',this.value)"></select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Media Type</label>
+                    <select class="filter-select" id="fMedia" onchange="setFilter('media',this.value)"></select>
+                </div>
+                <button class="filter-reset" onclick="resetFilters()">Reset All</button>
+            </div>
+
+            <div class="toggle-bar">
+                <span class="toggle-label">Views:</span>
+                <button class="toggle-btn on" data-target="metricsWrap">Overview</button>
+                <button class="toggle-btn on" data-target="chartDonut">Media Type</button>
+                <button class="toggle-btn on" data-target="chartTimeline">Timeline</button>
+                <button class="toggle-btn on" data-target="chartTemplate">Performance</button>
+                <button class="toggle-btn on" data-target="chartSessions">Recent Feed</button>
+            </div>
+
+            <div class="metrics-grid" id="metricsWrap">
+                <div class="metric-card glass-panel"><div class="metric-label">Total Sessions</div><div class="metric-value" id="mTotal">—</div><div class="metric-sub">Total usages</div></div>
+                <div class="metric-card glass-panel"><div class="metric-label">Photo Output</div><div class="metric-value" id="mPhoto" style="color:var(--photo); text-shadow: 0 0 20px rgba(6,182,212,0.4);">—</div><div class="metric-sub"><span class="trend-up" id="mPhotoSub"></span> of total</div></div>
+                <div class="metric-card glass-panel"><div class="metric-label">Video Output</div><div class="metric-value" id="mVideo" style="color:var(--video); text-shadow: 0 0 20px rgba(139,92,246,0.4);">—</div><div class="metric-sub"><span class="trend-up" id="mVideoSub"></span> of total</div></div>
+                <div class="metric-card glass-panel"><div class="metric-label">Abandoned</div><div class="metric-value" id="mAbandoned" style="color:var(--abandoned);">—</div><div class="metric-sub" id="mAbandonSub"></div></div>
+                <div class="metric-card glass-panel"><div class="metric-label">Completion Rate</div><div class="metric-value" id="mRate">—</div><div class="metric-sub">Successfully finished</div></div>
+                
+                <div class="metric-card glass-panel"><div class="metric-label">Shared to Social</div><div class="metric-value" id="mShared" style="color:var(--shared); text-shadow: 0 0 20px rgba(236,72,153,0.4);">—</div><div class="metric-sub"><span class="trend-up" style="background:rgba(236,72,153,0.15); color:var(--shared);" id="mSharedSub">0%</span> share rate</div></div>
+                
+                <div class="metric-card glass-panel"><div class="metric-label">QR Scans</div><div class="metric-value" id="mQR" style="color:#facc15; text-shadow: 0 0 20px rgba(250,204,21,0.3);">—</div><div class="metric-sub" id="mQRSub"></div></div>
+                <div class="metric-card glass-panel"><div class="metric-label">Device Saves</div><div class="metric-value" id="mSaved">—</div><div class="metric-sub">Saved to local</div></div>
+                <div class="metric-card glass-panel"><div class="metric-label">Avg. Duration</div><div class="metric-value" id="mAvg">—</div><div class="metric-sub">Per completed session</div></div>
+            </div>
+
+            <div class="charts-2col">
+                <div class="chart-card glass-panel" id="chartTimeline">
+                    <div class="chart-title">Activity Timeline</div>
+                    <div class="chart-wrap"><canvas id="timelineChart"></canvas></div>
+                </div>
+                <div class="chart-card glass-panel" id="chartDonut">
+                    <div class="chart-title">Media Distribution</div>
+                    <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="charts-2col" style="grid-template-columns: 1fr 1fr;" id="chartTemplate">
+                <div class="chart-card glass-panel">
+                    <div class="chart-title">Template Performance</div>
+                    <div id="templateWrap" style="overflow:auto; height: 350px;"></div>
+                </div>
+                <div class="chart-card glass-panel" id="chartSessions">
+                    <div class="chart-title">Live Interactions</div>
+                    <div class="sessions-list" id="sessionsList"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="metrics-grid" id="metricsWrap">
-      <div class="metric-card glass-panel"><div class="metric-label">Total Sessions</div><div class="metric-value" id="mTotal">—</div><div class="metric-sub">Total usages</div></div>
-      <div class="metric-card glass-panel"><div class="metric-label">Photo Output</div><div class="metric-value" id="mPhoto" style="color:var(--photo); text-shadow: 0 0 20px rgba(6,182,212,0.4);">—</div><div class="metric-sub"><span class="trend-up" id="mPhotoSub"></span> of total</div></div>
-      <div class="metric-card glass-panel"><div class="metric-label">Video Output</div><div class="metric-value" id="mVideo" style="color:var(--video); text-shadow: 0 0 20px rgba(139,92,246,0.4);">—</div><div class="metric-sub"><span class="trend-up" id="mVideoSub"></span> of total</div></div>
-      <div class="metric-card glass-panel"><div class="metric-label">Abandoned</div><div class="metric-value" id="mAbandoned" style="color:var(--abandoned);">—</div><div class="metric-sub" id="mAbandonSub"></div></div>
-      <div class="metric-card glass-panel"><div class="metric-label">Completion Rate</div><div class="metric-value" id="mRate">—</div><div class="metric-sub">Successfully finished</div></div>
-      <div class="metric-card glass-panel"><div class="metric-label">QR Scans</div><div class="metric-value" id="mQR" style="color:#facc15; text-shadow: 0 0 20px rgba(250,204,21,0.3);">—</div><div class="metric-sub" id="mQRSub"></div></div>
-      <div class="metric-card glass-panel"><div class="metric-label">Device Saves</div><div class="metric-value" id="mSaved">—</div><div class="metric-sub">Saved to local</div></div>
-      <div class="metric-card glass-panel"><div class="metric-label">Avg. Duration</div><div class="metric-value" id="mAvg">—</div><div class="metric-sub">Per completed session</div></div>
-    </div>
+    <script>
+        // ── CONFIG ──────────────────────────────────────────────────
+        const GH_OWNER = 'manonlichSmallgoodstudio';
+        const GH_REPO = 'booth-dashboard';
+        const CSV_URL = 'https://raw.githubusercontent.com/manonlichSmallgoodstudio/booth-dashboard/main/data/booth_stats.csv';
+        const REFRESH_SEC = 10;
 
-    <div class="charts-2col">
-      <div class="chart-card glass-panel" id="chartTimeline">
-        <div class="chart-title">Activity Timeline</div>
-        <div class="chart-wrap"><canvas id="timelineChart"></canvas></div>
-      </div>
-      <div class="chart-card glass-panel" id="chartDonut">
-        <div class="chart-title">Media Distribution</div>
-        <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
-      </div>
-    </div>
+        let allData = [], prevCount = 0, refreshSec = REFRESH_SEC, refreshTimer = null;
+        let fDate = 'all', fEvent = 'all', fTemplate = 'all', fMedia = 'all';
+        let donutChart = null, timelineChart = null;
+        let prevListCount = 0;
 
-    <div class="charts-2col" style="grid-template-columns: 1fr 1fr;" id="chartTemplate">
-      <div class="chart-card glass-panel">
-        <div class="chart-title">Template Performance</div>
-        <div id="templateWrap" style="overflow:auto; height: 350px;"></div>
-      </div>
-      <div class="chart-card glass-panel" id="chartSessions">
-        <div class="chart-title">Live Interactions</div>
-        <div class="sessions-list" id="sessionsList"></div>
-      </div>
-    </div>
-  </div>
-</div>
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+        Chart.defaults.scale.grid.borderColor = 'transparent';
 
-<script>
-// ── CONFIG ──────────────────────────────────────────────────
-const GH_OWNER  = 'manonlichSmallgoodstudio'; 
-const GH_REPO   = 'booth-dashboard';       
-// ใช้ลิงก์ raw.githubusercontent.com แทน
-const CSV_URL = 'https://raw.githubusercontent.com/manonlichSmallgoodstudio/booth-dashboard/main/data/booth_stats.csv';
-const REFRESH_SEC = 10;
+        async function init() { await fetchCSV(); startLive(); }
 
-let allData = [], prevCount = 0, refreshSec = REFRESH_SEC, refreshTimer = null;
-let fDate = 'all', fEvent = 'all', fTemplate = 'all', fMedia = 'all';
-let donutChart = null, timelineChart = null;
-let prevListCount = 0;
+        async function fetchCSV() {
+            try {
+                const purgeUrl = CSV_URL.replace('cdn.jsdelivr.net/gh', 'purge.jsdelivr.net/gh');
+                await fetch(purgeUrl).catch(() => { });
+                const res = await fetch(CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
+                if (!res.ok) {
+                    setStatus(res.status === 404 ? 'ยังไม่มีข้อมูล' : `Error ${res.status}`); return;
+                }
+                const text = await res.text();
+                const parsed = parseCSV(text);
+                const isNew = parsed.length !== prevCount;
+                prevCount = parsed.length;
+                allData = parsed;
+                setStatus('');
+                document.getElementById('fileName').textContent = `Live Data Connection`;
+                document.getElementById('fileMeta').textContent = `Total Records: ${allData.length} | Last Sync: ${new Date().toLocaleTimeString('th-TH')}`;
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('th-TH');
+                document.getElementById('dashboard').style.display = 'block';
+                syncDropdowns(); render(isNew);
+            } catch (err) { setStatus('Connection failed: ' + err.message); }
+        }
 
-Chart.defaults.color = '#94a3b8';
-Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
-Chart.defaults.scale.grid.borderColor = 'transparent';
+        function startLive() {
+            clearInterval(refreshTimer);
+            refreshTimer = setInterval(fetchCSV, refreshSec * 1000);
+            document.getElementById('livePill').style.display = 'flex';
+            const btn = document.getElementById('intervalBtn');
+            btn.style.display = 'block'; btn.textContent = `↻ ${refreshSec}s`;
+        }
 
-async function init() { await fetchCSV(); startLive(); }
+        function cycleInterval() {
+            const opts = [5, 10, 30, 60];
+            refreshSec = opts[(opts.indexOf(refreshSec) + 1) % opts.length];
+            startLive();
+        }
 
-async function fetchCSV() {
-  try {
-    const purgeUrl = CSV_URL.replace('cdn.jsdelivr.net/gh', 'purge.jsdelivr.net/gh');
-    await fetch(purgeUrl).catch(() => {});
-    const res = await fetch(CSV_URL + '?t=' + Date.now(), { cache: 'no-store' }); 
-    if (!res.ok) {
-      setStatus(res.status === 404 ? 'ยังไม่มีข้อมูล' : `Error ${res.status}`); return;
-    }
-    const text = await res.text();
-    const parsed = parseCSV(text);
-    const isNew = parsed.length !== prevCount;
-    prevCount = parsed.length;
-    allData = parsed;
-    setStatus('');
-    // ซ่อนชื่อ Repo ออกตามที่เคยรีเควสไว้
-    document.getElementById('fileName').textContent = `Live Data Connection`;
-    document.getElementById('fileMeta').textContent = `Total Records: ${allData.length} | Last Sync: ${new Date().toLocaleTimeString('th-TH')}`;
-    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('th-TH');
-    document.getElementById('dashboard').style.display = 'block';
-    syncDropdowns(); render(isNew);
-  } catch (err) { setStatus('Connection failed: ' + err.message); }
-}
+        function setStatus(msg) { document.getElementById('statusMsg').textContent = msg; }
 
-function startLive() {
-  clearInterval(refreshTimer);
-  refreshTimer = setInterval(fetchCSV, refreshSec * 1000);
-  document.getElementById('livePill').style.display = 'flex';
-  const btn = document.getElementById('intervalBtn');
-  btn.style.display = 'block'; btn.textContent = `↻ ${refreshSec}s`;
-}
+        function parseLine(line) {
+            const res = []; let cur = '', inQ = false;
+            for (const c of line) {
+                if (c === '"') { inQ = !inQ; }
+                else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
+                else cur += c;
+            }
+            res.push(cur); return res;
+        }
 
-function cycleInterval() {
-  const opts = [5, 10, 30, 60];
-  refreshSec = opts[(opts.indexOf(refreshSec) + 1) % opts.length];
-  startLive();
-}
+        function parseCSV(text) {
+            const lines = text.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
+            if (lines.length < 2) return [];
+            const hdr = parseLine(lines[0]).map(h => h.trim());
+            return lines.slice(1).map(l => {
+                const v = parseLine(l);
+                const o = {};
+                hdr.forEach((h, i) => o[h] = (v[i] || '').replace(/^"|"$/g, '').trim());
+                return o;
+            }).filter(r => r.Session);
+        }
 
-function setStatus(msg) { document.getElementById('statusMsg').textContent = msg; }
+        function uniq(arr) { return [...new Set(arr)].filter(Boolean).sort(); }
+        function fillSelect(id, values, current) {
+            const sel = document.getElementById(id);
+            sel.innerHTML = `<option value="all">All</option>` + values.map(v => `<option value="${v}" ${v === current ? 'selected' : ''}>${v}</option>`).join('');
+            if (current !== 'all' && values.includes(current)) sel.value = current;
+        }
+        function syncDropdowns() {
+            fillSelect('fDate', uniq(allData.map(s => s.Date)), fDate);
+            fillSelect('fEvent', uniq(allData.map(s => s.EventName)), fEvent);
+            fillSelect('fTemplate', uniq(allData.map(s => s.LayersUsed)), fTemplate);
+            fillSelect('fMedia', uniq(allData.map(s => s.MediaType)), fMedia);
+        }
+        function setFilter(type, val) {
+            if (type === 'date') fDate = val; if (type === 'event') fEvent = val;
+            if (type === 'template') fTemplate = val; if (type === 'media') fMedia = val;
+            render(false);
+        }
+        function resetFilters() { fDate = fEvent = fTemplate = fMedia = 'all'; syncDropdowns(); render(false); }
 
-function parseLine(line) {
-  const res = []; let cur = '', inQ = false;
-  for (const c of line) {
-    if (c === '"') { inQ = !inQ; }
-    else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
-    else cur += c;
-  }
-  res.push(cur); return res;
-}
+        function filtered() {
+            return allData.filter(s =>
+                (fDate === 'all' || s.Date === fDate) && (fEvent === 'all' || s.EventName === fEvent) &&
+                (fTemplate === 'all' || s.LayersUsed === fTemplate) && (fMedia === 'all' || s.MediaType === fMedia)
+            );
+        }
 
-function parseCSV(text) {
-  const lines = text.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
-  if (lines.length < 2) return [];
-  const hdr = parseLine(lines[0]).map(h => h.trim());
-  return lines.slice(1).map(l => {
-    const v = parseLine(l);
-    const o = {};
-    hdr.forEach((h, i) => o[h] = (v[i] || '').replace(/^"|"$/g, '').trim());
-    return o;
-  }).filter(r => r.Session);
-}
+        // 3. ฟังก์ชันช่วยดึงค่าเพื่อแปลงค่าพวก 1, yes, true จาก CSV ให้กลายเป็นตัวเลข
+        function parseCount(val) {
+            if (!val) return 0;
+            const str = String(val).toLowerCase().trim();
+            return (str === '1' || str === 'true' || str === 'yes') ? 1 : (parseInt(str) || 0);
+        }
 
-function uniq(arr) { return [...new Set(arr)].filter(Boolean).sort(); }
-function fillSelect(id, values, current) {
-  const sel = document.getElementById(id);
-  sel.innerHTML = `<option value="all">All</option>` + values.map(v => `<option value="${v}" ${v === current ? 'selected' : ''}>${v}</option>`).join('');
-  if (current !== 'all' && values.includes(current)) sel.value = current;
-}
-function syncDropdowns() {
-  fillSelect('fDate', uniq(allData.map(s => s.Date)), fDate);
-  fillSelect('fEvent', uniq(allData.map(s => s.EventName)), fEvent);
-  fillSelect('fTemplate', uniq(allData.map(s => s.LayersUsed)), fTemplate);
-  fillSelect('fMedia', uniq(allData.map(s => s.MediaType)), fMedia);
-}
-function setFilter(type, val) {
-  if (type === 'date') fDate = val; if (type === 'event') fEvent = val;
-  if (type === 'template') fTemplate = val; if (type === 'media') fMedia = val;
-  render(false);
-}
-function resetFilters() { fDate = fEvent = fTemplate = fMedia = 'all'; syncDropdowns(); render(false); }
+        function render(flash) {
+            const d = filtered();
+            const photos = d.filter(s => s.MediaType === 'Photo');
+            const videos = d.filter(s => s.MediaType === 'Video');
+            const abandoned = d.filter(s => s.MediaType === 'Abandoned');
+            const completed = [...photos, ...videos];
+            const total = d.length;
+            
+            const qr = d.reduce((a, s) => a + parseCount(s.QR_Scans), 0);
+            const saved = d.reduce((a, s) => a + parseCount(s.SavedToDevice), 0);
+            
+            // 4. คำนวณค่า Shared to Social จากคอลัมน์ชื่อ share to social (รองรับ ShareToSocial, share)
+            const shared = d.reduce((a, s) => a + parseCount(s['share to social'] || s['ShareToSocial'] || s['share']), 0);
 
-function filtered() {
-  return allData.filter(s =>
-    (fDate === 'all' || s.Date === fDate) && (fEvent === 'all' || s.EventName === fEvent) &&
-    (fTemplate === 'all' || s.LayersUsed === fTemplate) && (fMedia === 'all' || s.MediaType === fMedia)
-  );
-}
+            const avgDur = completed.length ? completed.reduce((a, s) => a + (parseFloat(s['Duration(sec)']) || 0), 0) / completed.length : 0;
+            const rate = total ? Math.round(completed.length / total * 100) : 0;
+            const pct = n => total ? `${Math.round(n / total * 100)}%` : '0%';
+            
+            // หาอัตราส่วนที่แชร์คิดเป็น % 
+            const shareRate = completed.length ? Math.round((shared / completed.length) * 100) : 0;
 
-function render(flash) {
-  const d = filtered();
-  const photos = d.filter(s => s.MediaType === 'Photo');
-  const videos = d.filter(s => s.MediaType === 'Video');
-  const abandoned = d.filter(s => s.MediaType === 'Abandoned');
-  const completed = [...photos, ...videos];
-  const total = d.length;
-  const qr = d.reduce((a, s) => a + (parseInt(s.QR_Scans) || 0), 0);
-  const saved = d.reduce((a, s) => a + (parseInt(s.SavedToDevice) || 0), 0);
-  const avgDur = completed.length ? completed.reduce((a, s) => a + (parseFloat(s['Duration(sec)']) || 0), 0) / completed.length : 0;
-  const rate = total ? Math.round(completed.length / total * 100) : 0;
-  const pct = n => total ? `${Math.round(n / total * 100)}%` : '0%';
+            document.getElementById('mTotal').textContent = total;
+            document.getElementById('mPhoto').textContent = photos.length;
+            document.getElementById('mPhotoSub').textContent = pct(photos.length);
+            document.getElementById('mVideo').textContent = videos.length;
+            document.getElementById('mVideoSub').textContent = pct(videos.length);
+            document.getElementById('mAbandoned').textContent = abandoned.length;
+            document.getElementById('mAbandonSub').textContent = pct(abandoned.length) + " cancel rate";
+            document.getElementById('mRate').textContent = rate + '%';
+            document.getElementById('mQR').textContent = qr;
+            document.getElementById('mQRSub').textContent = `avg ${(completed.length ? (qr / completed.length) : 0).toFixed(1)} / session`;
+            document.getElementById('mSaved').textContent = saved;
+            
+            // 5. นำตัวเลขสะสม Shared ส่งให้การ์ดแสดงผล
+            document.getElementById('mShared').textContent = shared;
+            document.getElementById('mSharedSub').textContent = shareRate + '%';
+            
+            document.getElementById('mAvg').textContent = avgDur.toFixed(1) + 's';
 
-  document.getElementById('mTotal').textContent = total;
-  document.getElementById('mPhoto').textContent = photos.length;
-  document.getElementById('mPhotoSub').textContent = pct(photos.length);
-  document.getElementById('mVideo').textContent = videos.length;
-  document.getElementById('mVideoSub').textContent = pct(videos.length);
-  document.getElementById('mAbandoned').textContent = abandoned.length;
-  document.getElementById('mAbandonSub').textContent = pct(abandoned.length) + " cancel rate";
-  document.getElementById('mRate').textContent = rate + '%';
-  document.getElementById('mQR').textContent = qr;
-  document.getElementById('mQRSub').textContent = `avg ${(completed.length ? (qr/completed.length) : 0).toFixed(1)} / session`;
-  document.getElementById('mSaved').textContent = saved;
-  document.getElementById('mAvg').textContent = avgDur.toFixed(1) + 's';
+            renderDonut(photos.length, videos.length, abandoned.length);
+            renderTimeline(d);
+            renderTemplateTable(d);
+            renderSessions(d, flash);
+        }
 
-  renderDonut(photos.length, videos.length, abandoned.length);
-  renderTimeline(d);
-  renderTemplateTable(d);
-  renderSessions(d, flash);
-}
+        function renderDonut(p, v, a) {
+            const ctx = document.getElementById('donutChart').getContext('2d');
+            const data = {
+                labels: ['Photo', 'Video', 'Abandoned'],
+                datasets: [{
+                    data: [p, v, a],
+                    backgroundColor: ['#06b6d4', '#8b5cf6', '#f43f5e'],
+                    borderWidth: 0,
+                    hoverOffset: 6,
+                    borderRadius: 4
+                }]
+            };
+            const opts = {
+                responsive: true, maintainAspectRatio: false, cutout: '70%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 20, usePointStyle: true, pointStyle: 'circle' } }
+                }
+            };
+            if (donutChart) { Object.assign(donutChart.data, data); donutChart.update('none'); }
+            else donutChart = new Chart(ctx, { type: 'doughnut', data, options: opts });
+        }
 
-function renderDonut(p, v, a) {
-  const ctx = document.getElementById('donutChart').getContext('2d');
-  const data = { 
-    labels: ['Photo','Video','Abandoned'], 
-    datasets: [{ 
-      data:[p,v,a], 
-      backgroundColor:['#06b6d4','#8b5cf6','#f43f5e'], 
-      borderWidth: 0, 
-      hoverOffset: 6,
-      borderRadius: 4
-    }] 
-  };
-  const opts = { 
-    responsive: true, maintainAspectRatio: false, cutout: '70%', 
-    plugins: { 
-      legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 20, usePointStyle: true, pointStyle: 'circle' } } 
-    } 
-  };
-  if (donutChart) { Object.assign(donutChart.data, data); donutChart.update('none'); }
-  else donutChart = new Chart(ctx, { type:'doughnut', data, options:opts });
-}
+        function renderTimeline(d) {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            const H = () => Object.fromEntries(Array.from({ length: 24 }, (_, i) => [i, 0]));
+            const ph = H(), vi = H();
+            d.forEach(s => {
+                const h = parseInt((s.Time || '0').split(':')[0]);
+                if (s.MediaType === 'Photo') ph[h]++;
+                else if (s.MediaType === 'Video') vi[h]++;
+            });
+            const labels = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0') + ':00');
 
-function renderTimeline(d) {
-  const ctx = document.getElementById('timelineChart').getContext('2d');
-  const H = () => Object.fromEntries(Array.from({length:24},(_,i)=>[i,0]));
-  const ph = H(), vi = H();
-  d.forEach(s => {
-    const h = parseInt((s.Time||'0').split(':')[0]);
-    if (s.MediaType==='Photo') ph[h]++;
-    else if (s.MediaType==='Video') vi[h]++;
-  });
-  const labels = Array.from({length:24},(_,i)=>String(i).padStart(2,'0')+':00');
-  
-  let gradPhoto = ctx.createLinearGradient(0, 0, 0, 300);
-  gradPhoto.addColorStop(0, 'rgba(6, 182, 212, 0.4)'); gradPhoto.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
-  let gradVideo = ctx.createLinearGradient(0, 0, 0, 300);
-  gradVideo.addColorStop(0, 'rgba(139, 92, 246, 0.4)'); gradVideo.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
+            let gradPhoto = ctx.createLinearGradient(0, 0, 0, 300);
+            gradPhoto.addColorStop(0, 'rgba(6, 182, 212, 0.4)'); gradPhoto.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
+            let gradVideo = ctx.createLinearGradient(0, 0, 0, 300);
+            gradVideo.addColorStop(0, 'rgba(139, 92, 246, 0.4)'); gradVideo.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
 
-  const ds = [
-    { label:'Photo', data:Object.values(ph), borderColor:'#06b6d4', backgroundColor:gradPhoto, borderWidth:3, tension:0.4, fill:true, pointRadius:0, pointHoverRadius:6 },
-    { label:'Video', data:Object.values(vi), borderColor:'#8b5cf6', backgroundColor:gradVideo, borderWidth:3, tension:0.4, fill:true, pointRadius:0, pointHoverRadius:6 }
-  ];
-  const opts = {
-    responsive:true, maintainAspectRatio:false,
-    interaction: { mode: 'index', intersect: false },
-    plugins:{ legend:{ display: true, position: 'top', align: 'end', labels:{ color:'#e2e8f0', usePointStyle: true, boxWidth: 6 } } },
-    scales:{
-      x:{ grid:{display:false}, ticks:{maxRotation:0, maxTicksLimit: 8} }, /* ลดป้ายแกน X ให้ไม่เบียดบนมือถือ */
-      y:{ beginAtZero:true, border:{display:false} }
-    }
-  };
-  if (timelineChart) { timelineChart.data.datasets.forEach((s,i)=>s.data=ds[i].data); timelineChart.update('none'); }
-  else timelineChart = new Chart(ctx,{type:'line',data:{labels,datasets:ds},options:opts});
-}
+            const ds = [
+                { label: 'Photo', data: Object.values(ph), borderColor: '#06b6d4', backgroundColor: gradPhoto, borderWidth: 3, tension: 0.4, fill: true, pointRadius: 0, pointHoverRadius: 6 },
+                { label: 'Video', data: Object.values(vi), borderColor: '#8b5cf6', backgroundColor: gradVideo, borderWidth: 3, tension: 0.4, fill: true, pointRadius: 0, pointHoverRadius: 6 }
+            ];
+            const opts = {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { display: true, position: 'top', align: 'end', labels: { color: '#e2e8f0', usePointStyle: true, boxWidth: 6 } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { maxRotation: 0, maxTicksLimit: 8 } },
+                    y: { beginAtZero: true, border: { display: false } }
+                }
+            };
+            if (timelineChart) { timelineChart.data.datasets.forEach((s, i) => s.data = ds[i].data); timelineChart.update('none'); }
+            else timelineChart = new Chart(ctx, { type: 'line', data: { labels, datasets: ds }, options: opts });
+        }
 
-function renderTemplateTable(d) {
-  const map = {};
-  d.forEach(s => {
-    const t = s.LayersUsed || 'Unknown';
-    if (!map[t]) map[t] = { total:0, photo:0, video:0, qr:0 };
-    map[t].total++; map[t].qr += parseInt(s.QR_Scans)||0;
-    if (s.MediaType==='Photo') map[t].photo++;
-    else if (s.MediaType==='Video') map[t].video++;
-  });
-  const rows = Object.entries(map).sort((a,b)=>b[1].total-a[1].total);
-  const max = rows[0]?.[1].total || 1;
-  const colors = ['#3b82f6','#06b6d4','#8b5cf6','#facc15','#ec4899'];
-  document.getElementById('templateWrap').innerHTML = `
-    <table class="tbl">
-      <thead><tr><th>Layer / Template</th><th>Total</th><th>Distribution</th><th>Scans</th></tr></thead>
-      <tbody>${rows.map(([t,v],i)=>`
-        <tr>
-          <td style="color:#e2e8f0">${t}</td>
-          <td style="font-size:16px; font-weight:700">${v.total}</td>
-          <td style="width:40%; min-width: 100px;">
-            <div class="tbar"><div class="tbar-fill" style="width:${Math.round(v.total/max*100)}%;background:${colors[i%colors.length]};box-shadow: 0 0 10px ${colors[i%colors.length]}"></div></div>
-          </td>
-          <td>${v.qr}</td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
-}
+        function renderTemplateTable(d) {
+            const map = {};
+            d.forEach(s => {
+                const t = s.LayersUsed || 'Unknown';
+                if (!map[t]) map[t] = { total: 0, photo: 0, video: 0, qr: 0 };
+                map[t].total++; map[t].qr += parseInt(s.QR_Scans) || 0;
+                if (s.MediaType === 'Photo') map[t].photo++;
+                else if (s.MediaType === 'Video') map[t].video++;
+            });
+            const rows = Object.entries(map).sort((a, b) => b[1].total - a[1].total);
+            const max = rows[0]?.[1].total || 1;
+            const colors = ['#3b82f6', '#06b6d4', '#8b5cf6', '#facc15', '#ec4899'];
+            document.getElementById('templateWrap').innerHTML = `
+        <table class="tbl">
+          <thead><tr><th>Layer / Template</th><th>Total</th><th>Distribution</th><th>Scans</th></tr></thead>
+          <tbody>${rows.map(([t, v], i) => `
+            <tr>
+              <td style="color:#e2e8f0">${t}</td>
+              <td style="font-size:16px; font-weight:700">${v.total}</td>
+              <td style="width:40%; min-width: 100px;">
+                <div class="tbar"><div class="tbar-fill" style="width:${Math.round(v.total / max * 100)}%;background:${colors[i % colors.length]};box-shadow: 0 0 10px ${colors[i % colors.length]}"></div></div>
+              </td>
+              <td>${v.qr}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+        }
 
-function renderSessions(d, flash) {
-  const recent = [...d].reverse().slice(0, 40);
-  const newCount = flash ? d.length - prevListCount : 0;
-  if (flash) prevListCount = d.length;
-  document.getElementById('sessionsList').innerHTML = recent.length === 0
-    ? '<div class="empty">No interactions yet</div>'
-    : recent.map((s, i) => `
-      <div class="session-row">
-        <span class="stype ${s.MediaType}">${s.MediaType}</span>
-        <span class="stime">${s.Date} <br/> <strong style="color:#e2e8f0">${s.Time}</strong></span>
-        <span class="stemplate">${s.EventName} <br/><span style="color:var(--text3); font-size:11px">${s.LayersUsed||'—'}</span></span>
-        <span class="sdur">${parseFloat(s['Duration(sec)']).toFixed(1)}s ${i < newCount ? '<span class="new-tag">NEW</span>' : ''}</span>
-      </div>`).join('');
-}
+        function renderSessions(d, flash) {
+            const recent = [...d].reverse().slice(0, 40);
+            const newCount = flash ? d.length - prevListCount : 0;
+            if (flash) prevListCount = d.length;
+            document.getElementById('sessionsList').innerHTML = recent.length === 0
+                ? '<div class="empty">No interactions yet</div>'
+                : recent.map((s, i) => `
+          <div class="session-row">
+            <span class="stype ${s.MediaType}">${s.MediaType}</span>
+            <span class="stime">${s.Date} <br/> <strong style="color:#e2e8f0">${s.Time}</strong></span>
+            <span class="stemplate">${s.EventName} <br/><span style="color:var(--text3); font-size:11px">${s.LayersUsed || '—'}</span></span>
+            <span class="sdur">${parseFloat(s['Duration(sec)']).toFixed(1)}s ${i < newCount ? '<span class="new-tag">NEW</span>' : ''}</span>
+          </div>`).join('');
+        }
 
-document.querySelectorAll('.toggle-btn').forEach(btn => {
-  btn.onclick = () => {
-    const isOn = btn.classList.contains('on');
-    btn.classList.toggle('on', !isOn);
-    btn.classList.toggle('off', isOn);
-    const el = document.getElementById(btn.dataset.target);
-    if (el) el.classList.toggle('hidden', isOn);
-  };
-});
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.onclick = () => {
+                const isOn = btn.classList.contains('on');
+                btn.classList.toggle('on', !isOn);
+                btn.classList.toggle('off', isOn);
+                const el = document.getElementById(btn.dataset.target);
+                if (el) el.classList.toggle('hidden', isOn);
+            };
+        });
 
-init();
-</script>
+        init();
+    </script>
 </body>
 </html>
