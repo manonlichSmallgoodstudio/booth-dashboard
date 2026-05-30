@@ -910,7 +910,7 @@
             const saved = d.reduce((a, s) => a + parseCount(s.SavedToDevice), 0);
             
             // 4. คำนวณค่า Shared to Social จากคอลัมน์ชื่อ share to social (รองรับ ShareToSocial, share)
-            const shared = d.reduce((a, s) => a + parseCount(s['share to social'] || s['ShareToSocial'] || s['share']), 0);
+            const shared = d.reduce((a, s) => a + parseCount(s['share to social'] || s['SharedToSocial'] || s['share']), 0);
 
             const avgDur = completed.length ? completed.reduce((a, s) => a + (parseFloat(s['Duration(sec)']) || 0), 0) / completed.length : 0;
             const rate = total ? Math.round(completed.length / total * 100) : 0;
