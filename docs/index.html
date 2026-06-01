@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booth Dashboard</title>
-    
+
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -30,7 +30,7 @@
             --photo: #06b6d4;
             --video: #8b5cf6;
             --abandoned: #f43f5e;
-            --shared: #ec4899; /* เพิ่มสีสำหรับการ์ด Share */
+            --shared: #ec4899;
             --radius: 16px;
         }
 
@@ -538,14 +538,12 @@
                 background: rgba(255,255,255,0.2);
             }
 
-        /* 📱 Responsive สำหรับ iPad/Tablet */
         @media (max-width: 1024px) {
             .charts-2col {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* 📱 Responsive สำหรับ Mobile มือถือ */
         @media (max-width: 768px) {
             .topbar {
                 padding: 12px 16px;
@@ -754,9 +752,7 @@
                 <div class="metric-card glass-panel"><div class="metric-label">Video Output</div><div class="metric-value" id="mVideo" style="color:var(--video); text-shadow: 0 0 20px rgba(139,92,246,0.4);">—</div><div class="metric-sub"><span class="trend-up" id="mVideoSub"></span> of total</div></div>
                 <div class="metric-card glass-panel"><div class="metric-label">Abandoned</div><div class="metric-value" id="mAbandoned" style="color:var(--abandoned);">—</div><div class="metric-sub" id="mAbandonSub"></div></div>
                 <div class="metric-card glass-panel"><div class="metric-label">Completion Rate</div><div class="metric-value" id="mRate">—</div><div class="metric-sub">Successfully finished</div></div>
-                
                 <div class="metric-card glass-panel"><div class="metric-label">Shared to Social</div><div class="metric-value" id="mShared" style="color:var(--shared); text-shadow: 0 0 20px rgba(236,72,153,0.4);">—</div><div class="metric-sub"><span class="trend-up" style="background:rgba(236,72,153,0.15); color:var(--shared);" id="mSharedSub">0%</span> share rate</div></div>
-                
                 <div class="metric-card glass-panel"><div class="metric-label">QR Scans</div><div class="metric-value" id="mQR" style="color:#facc15; text-shadow: 0 0 20px rgba(250,204,21,0.3);">—</div><div class="metric-sub" id="mQRSub"></div></div>
                 <div class="metric-card glass-panel"><div class="metric-label">Device Saves</div><div class="metric-value" id="mSaved">—</div><div class="metric-sub">Saved to local</div></div>
                 <div class="metric-card glass-panel"><div class="metric-label">Avg. Duration</div><div class="metric-value" id="mAvg">—</div><div class="metric-sub">Per completed session</div></div>
@@ -853,6 +849,7 @@
             res.push(cur); return res;
         }
 
+        // 🛠️ ส่วนที่ 1: ตัวจับและแปลงวันที่แบบครอบจักรวาล ให้เป็น DD/MM/YYYY แบบมีศูนย์นำหน้า
         function parseCSV(text) {
             const lines = text.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
             if (lines.length < 2) return [];
@@ -860,7 +857,29 @@
             return lines.slice(1).map(l => {
                 const v = parseLine(l);
                 const o = {};
-                hdr.forEach((h, i) => o[h] = (v[i] || '').replace(/^"|"$/g, '').trim());
+                hdr.forEach((h, i) => {
+                    let val = (v[i] || '').replace(/^"|"$/g, '').trim();
+
+                    if (h === 'Date' && val) {
+                        const parts = val.split(/[-/]/);
+                        if (parts.length === 3) {
+                            let d, m, y;
+                            if (parts[0].length === 4) {
+                                // ถ้าเป็น YYYY-MM-DD หรือ YYYY/MM/DD
+                                y = parts[0]; m = parts[1]; d = parts[2];
+                            } else {
+                                // ถ้าเป็น D/M/YYYY หรือ DD/MM/YYYY
+                                d = parts[0]; m = parts[1]; y = parts[2];
+                            }
+                            // บังคับเติมเลข 0 นำหน้าให้เป็นมาตรฐานเดียวกันเป๊ะ (05 ไม่ใช่ 5)
+                            d = d.padStart(2, '0');
+                            m = m.padStart(2, '0');
+                            val = `${d}/${m}/${y}`;
+                        }
+                    }
+
+                    o[h] = val;
+                });
                 return o;
             }).filter(r => r.Session);
         }
@@ -871,12 +890,28 @@
             sel.innerHTML = `<option value="all">All</option>` + values.map(v => `<option value="${v}" ${v === current ? 'selected' : ''}>${v}</option>`).join('');
             if (current !== 'all' && values.includes(current)) sel.value = current;
         }
+
+        // 🛠️ ส่วนที่ 2: ระบบเรียงวันที่จากน้อยไปมาก โดยอิงตามปฏิทินที่ถูกต้อง
         function syncDropdowns() {
-            fillSelect('fDate', uniq(allData.map(s => s.Date)), fDate);
+            let dates = [...new Set(allData.map(s => s.Date))].filter(Boolean);
+            dates.sort((a, b) => {
+                const pA = a.split('/');
+                const pB = b.split('/');
+                if (pA.length === 3 && pB.length === 3) {
+                    // แปลงเทียบกันแบบ YYYYMMDD ทำให้ 01/06 (เดือนหก) ไปอยู่หลัง 31/05 (เดือนห้า)
+                    const valA = pA[2] + pA[1] + pA[0];
+                    const valB = pB[2] + pB[1] + pB[0];
+                    return valA.localeCompare(valB);
+                }
+                return a.localeCompare(b);
+            });
+
+            fillSelect('fDate', dates, fDate);
             fillSelect('fEvent', uniq(allData.map(s => s.EventName)), fEvent);
             fillSelect('fTemplate', uniq(allData.map(s => s.LayersUsed)), fTemplate);
             fillSelect('fMedia', uniq(allData.map(s => s.MediaType)), fMedia);
         }
+
         function setFilter(type, val) {
             if (type === 'date') fDate = val; if (type === 'event') fEvent = val;
             if (type === 'template') fTemplate = val; if (type === 'media') fMedia = val;
@@ -891,7 +926,6 @@
             );
         }
 
-        // 3. ฟังก์ชันช่วยดึงค่าเพื่อแปลงค่าพวก 1, yes, true จาก CSV ให้กลายเป็นตัวเลข
         function parseCount(val) {
             if (!val) return 0;
             const str = String(val).toLowerCase().trim();
@@ -905,18 +939,14 @@
             const abandoned = d.filter(s => s.MediaType === 'Abandoned');
             const completed = [...photos, ...videos];
             const total = d.length;
-            
+
             const qr = d.reduce((a, s) => a + parseCount(s.QR_Scans), 0);
             const saved = d.reduce((a, s) => a + parseCount(s.SavedToDevice), 0);
-            
-            // 4. คำนวณค่า Shared to Social จากคอลัมน์ชื่อ share to social (รองรับ ShareToSocial, share)
             const shared = d.reduce((a, s) => a + parseCount(s['share to social'] || s['SharedToSocial'] || s['share']), 0);
 
             const avgDur = completed.length ? completed.reduce((a, s) => a + (parseFloat(s['Duration(sec)']) || 0), 0) / completed.length : 0;
             const rate = total ? Math.round(completed.length / total * 100) : 0;
             const pct = n => total ? `${Math.round(n / total * 100)}%` : '0%';
-            
-            // หาอัตราส่วนที่แชร์คิดเป็น % 
             const shareRate = completed.length ? Math.round((shared / completed.length) * 100) : 0;
 
             document.getElementById('mTotal').textContent = total;
@@ -930,11 +960,8 @@
             document.getElementById('mQR').textContent = qr;
             document.getElementById('mQRSub').textContent = `avg ${(completed.length ? (qr / completed.length) : 0).toFixed(1)} / session`;
             document.getElementById('mSaved').textContent = saved;
-            
-            // 5. นำตัวเลขสะสม Shared ส่งให้การ์ดแสดงผล
             document.getElementById('mShared').textContent = shared;
             document.getElementById('mSharedSub').textContent = shareRate + '%';
-            
             document.getElementById('mAvg').textContent = avgDur.toFixed(1) + 's';
 
             renderDonut(photos.length, videos.length, abandoned.length);
@@ -948,18 +975,12 @@
             const data = {
                 labels: ['Photo', 'Video', 'Abandoned'],
                 datasets: [{
-                    data: [p, v, a],
-                    backgroundColor: ['#06b6d4', '#8b5cf6', '#f43f5e'],
-                    borderWidth: 0,
-                    hoverOffset: 6,
-                    borderRadius: 4
+                    data: [p, v, a], backgroundColor: ['#06b6d4', '#8b5cf6', '#f43f5e'], borderWidth: 0, hoverOffset: 6, borderRadius: 4
                 }]
             };
             const opts = {
                 responsive: true, maintainAspectRatio: false, cutout: '70%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 20, usePointStyle: true, pointStyle: 'circle' } }
-                }
+                plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 20, usePointStyle: true, pointStyle: 'circle' } } }
             };
             if (donutChart) { Object.assign(donutChart.data, data); donutChart.update('none'); }
             else donutChart = new Chart(ctx, { type: 'doughnut', data, options: opts });
@@ -986,8 +1007,7 @@
                 { label: 'Video', data: Object.values(vi), borderColor: '#8b5cf6', backgroundColor: gradVideo, borderWidth: 3, tension: 0.4, fill: true, pointRadius: 0, pointHoverRadius: 6 }
             ];
             const opts = {
-                responsive: true, maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { display: true, position: 'top', align: 'end', labels: { color: '#e2e8f0', usePointStyle: true, boxWidth: 6 } } },
                 scales: {
                     x: { grid: { display: false }, ticks: { maxRotation: 0, maxTicksLimit: 8 } },
@@ -1011,19 +1031,19 @@
             const max = rows[0]?.[1].total || 1;
             const colors = ['#3b82f6', '#06b6d4', '#8b5cf6', '#facc15', '#ec4899'];
             document.getElementById('templateWrap').innerHTML = `
-        <table class="tbl">
-          <thead><tr><th>Layer / Template</th><th>Total</th><th>Distribution</th><th>Scans</th></tr></thead>
-          <tbody>${rows.map(([t, v], i) => `
-            <tr>
-              <td style="color:#e2e8f0">${t}</td>
-              <td style="font-size:16px; font-weight:700">${v.total}</td>
-              <td style="width:40%; min-width: 100px;">
-                <div class="tbar"><div class="tbar-fill" style="width:${Math.round(v.total / max * 100)}%;background:${colors[i % colors.length]};box-shadow: 0 0 10px ${colors[i % colors.length]}"></div></div>
-              </td>
-              <td>${v.qr}</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>`;
+                <table class="tbl">
+                  <thead><tr><th>Layer / Template</th><th>Total</th><th>Distribution</th><th>Scans</th></tr></thead>
+                  <tbody>${rows.map(([t, v], i) => `
+                    <tr>
+                      <td style="color:#e2e8f0">${t}</td>
+                      <td style="font-size:16px; font-weight:700">${v.total}</td>
+                      <td style="width:40%; min-width: 100px;">
+                        <div class="tbar"><div class="tbar-fill" style="width:${Math.round(v.total / max * 100)}%;background:${colors[i % colors.length]};box-shadow: 0 0 10px ${colors[i % colors.length]}"></div></div>
+                      </td>
+                      <td>${v.qr}</td>
+                    </tr>`).join('')}
+                  </tbody>
+                </table>`;
         }
 
         function renderSessions(d, flash) {
@@ -1033,12 +1053,12 @@
             document.getElementById('sessionsList').innerHTML = recent.length === 0
                 ? '<div class="empty">No interactions yet</div>'
                 : recent.map((s, i) => `
-          <div class="session-row">
-            <span class="stype ${s.MediaType}">${s.MediaType}</span>
-            <span class="stime">${s.Date} <br/> <strong style="color:#e2e8f0">${s.Time}</strong></span>
-            <span class="stemplate">${s.EventName} <br/><span style="color:var(--text3); font-size:11px">${s.LayersUsed || '—'}</span></span>
-            <span class="sdur">${parseFloat(s['Duration(sec)']).toFixed(1)}s ${i < newCount ? '<span class="new-tag">NEW</span>' : ''}</span>
-          </div>`).join('');
+                  <div class="session-row">
+                    <span class="stype ${s.MediaType}">${s.MediaType}</span>
+                    <span class="stime">${s.Date} <br/> <strong style="color:#e2e8f0">${s.Time}</strong></span>
+                    <span class="stemplate">${s.EventName} <br/><span style="color:var(--text3); font-size:11px">${s.LayersUsed || '—'}</span></span>
+                    <span class="sdur">${parseFloat(s['Duration(sec)']).toFixed(1)}s ${i < newCount ? '<span class="new-tag">NEW</span>' : ''}</span>
+                  </div>`).join('');
         }
 
         document.querySelectorAll('.toggle-btn').forEach(btn => {
