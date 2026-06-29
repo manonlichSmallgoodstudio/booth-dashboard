@@ -10,12 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --bg-color: #060b19;
             --surface: rgba(16, 24, 46, 0.6);
@@ -69,630 +64,153 @@
             z-index: 100;
         }
 
-        .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text);
-            letter-spacing: -0.2px;
-        }
-
-        .live-pill {
-            display: none;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-
-        .live-dot {
-            width: 6px;
-            height: 6px;
-            background: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #10b981;
-            animation: blink 1.5s infinite;
-        }
-
-        @keyframes blink {
-            0%,100% {
-                opacity: 1
-            }
-
-            50% {
-                opacity: 0.3
-            }
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .last-update {
-            font-size: 12px;
-            color: var(--text3);
-        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .logo { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+        .live-pill { display: none; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #10b981; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 12px; border-radius: 20px; }
+        .live-dot { width: 6px; height: 6px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%,100% { opacity: 1 } 50% { opacity: 0.3 } }
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+        .last-update { font-size: 12px; color: var(--text3); }
 
         .btn {
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border2);
-            background: rgba(255,255,255,0.03);
-            color: var(--text);
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
+            font-family: inherit; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border2);
+            background: rgba(255,255,255,0.03); color: var(--text); cursor: pointer; transition: all 0.2s; white-space: nowrap;
         }
+        .btn:hover { border-color: var(--accent); color: #fff; background: var(--accent); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
 
-            .btn:hover {
-                border-color: var(--accent);
-                color: #fff;
-                background: var(--accent);
-                box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-            }
+        .main { padding: 24px; max-width: 1440px; margin: 0 auto; }
+        .file-bar { display: flex; align-items: center; gap: 16px; padding: 12px 20px; margin-bottom: 24px; flex-wrap: wrap; }
+        .file-name { font-size: 13px; font-weight: 600; color: var(--photo); flex: 1; }
+        .file-meta { font-size: 12px; color: var(--text2); white-space: nowrap; }
+        .status-msg { font-size: 12px; color: var(--abandoned); width: 100%; padding-top: 4px; }
 
-        .main {
-            padding: 24px;
-            max-width: 1440px;
-            margin: 0 auto;
-        }
-
-        .file-bar {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px 20px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .file-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--photo);
-            flex: 1;
-        }
-
-        .file-meta {
-            font-size: 12px;
-            color: var(--text2);
-            white-space: nowrap;
-        }
-
-        .status-msg {
-            font-size: 12px;
-            color: var(--abandoned);
-            width: 100%;
-            padding-top: 4px;
-        }
-
-        .filter-bar {
-            display: flex;
-            align-items: flex-end;
-            gap: 16px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .filter-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text3);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
+        .filter-bar { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; }
+        .filter-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
         .filter-select {
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text);
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 32px 8px 12px;
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
+            font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text); background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border); border-radius: 8px; padding: 8px 32px 8px 12px; cursor: pointer; appearance: none;
+            -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center; min-width: 150px; transition: all 0.2s;
+        }
+        .filter-select:hover, .filter-select:focus { border-color: var(--accent); outline: none; background-color: rgba(59,130,246,0.05); }
+        select option { background: #0f172a; color: #fff; }
+
+        /* ---------------- Custom Multi-Select Checkbox ---------------- */
+        .multi-select-container {
+            position: relative;
             min-width: 150px;
-            transition: all 0.2s;
         }
-
-            .filter-select:hover, .filter-select:focus {
-                border-color: var(--accent);
-                outline: none;
-                background-color: rgba(59,130,246,0.05);
-            }
-
-        select option {
-            background: #0f172a;
-            color: #fff;
+        .multi-select-trigger {
+            font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text); background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border); border-radius: 8px; padding: 8px 32px 8px 12px; cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center;
+            transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: none;
         }
-
-        .filter-reset {
-            font-family: inherit;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text3);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px 4px;
-            margin-bottom: 1px;
-            transition: color 0.2s;
+        .multi-select-trigger:hover, .multi-select-container.open .multi-select-trigger {
+            border-color: var(--accent); background-color: rgba(59,130,246,0.05);
         }
-
-            .filter-reset:hover {
-                color: var(--abandoned);
-            }
-
-        .toggle-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
+        .multi-select-menu {
+            position: absolute; top: 100%; left: 0; margin-top: 4px; min-width: 200px;
+            background: rgba(16, 24, 46, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border2); border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            z-index: 100; max-height: 250px; overflow-y: auto;
+            display: none; flex-direction: column; padding: 8px 0;
         }
-
-        .toggle-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text3);
-            margin-right: 4px;
+        .multi-select-container.open .multi-select-menu { display: flex; }
+        .checkbox-label {
+            display: flex; align-items: center; gap: 8px; padding: 6px 16px;
+            cursor: pointer; font-size: 13px; color: var(--text2); transition: all 0.1s;
         }
+        .checkbox-label:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .checkbox-label input[type="checkbox"] { cursor: pointer; accent-color: var(--accent); width: 14px; height: 14px; }
+        /* --------------------------------------------------------------- */
 
-        .toggle-btn {
-            font-family: inherit;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text2);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .filter-reset { font-family: inherit; font-size: 12px; font-weight: 600; color: var(--text3); background: none; border: none; cursor: pointer; padding: 8px 4px; margin-bottom: 1px; transition: color 0.2s; }
+        .filter-reset:hover { color: var(--abandoned); }
 
-            .toggle-btn.on {
-                background: var(--accent);
-                color: #fff;
-                border-color: var(--accent);
-                box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
-            }
+        .toggle-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+        .toggle-label { font-size: 12px; font-weight: 500; color: var(--text3); margin-right: 4px; }
+        .toggle-btn { font-family: inherit; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.2s; }
+        .toggle-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); }
+        .toggle-btn.off { opacity: 0.4; }
 
-            .toggle-btn.off {
-                opacity: 0.4;
-            }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .metric-card { padding: 20px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .metric-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--border2), transparent); }
+        .metric-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
+        .metric-value { font-size: 32px; font-weight: 700; line-height: 1; color: var(--text); letter-spacing: -1px; }
+        .metric-sub { font-size: 11px; font-weight: 500; color: var(--text3); margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+        .trend-up { color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px; }
 
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
+        .charts-2col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .chart-card { padding: 24px; }
+        .chart-card.hidden { display: none; }
+        .chart-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .chart-wrap { position: relative; height: 280px; width: 100%; }
 
-        .metric-card {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
+        .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .tbl th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 12px 12px 12px; border-bottom: 1px solid var(--border); }
+        .tbl td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.02); color: var(--text2); font-weight: 500; }
+        .tbl tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
+        .tbl td:first-child { color: var(--text); font-weight: 600; }
+        .tbar { height: 4px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; margin-top: 6px; min-width: 80px; }
+        .tbar-fill { height: 100%; border-radius: 4px; }
 
-            .metric-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 2px;
-                background: linear-gradient(90deg, transparent, var(--border2), transparent);
-            }
+        .sessions-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; padding-right: 8px; }
+        .session-row { display: grid; grid-template-columns: 80px 140px 1fr 60px; align-items: center; gap: 16px; padding: 12px 16px; border-radius: 12px; font-size: 13px; background: rgba(0,0,0,0.2); border: 1px solid transparent; transition: all 0.2s; }
+        .session-row:hover { background: var(--surface-hover); border-color: var(--border2); transform: translateY(-1px); }
+        .stype { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 8px; border-radius: 6px; text-align: center; }
+        .stype.Photo { color: var(--photo); background: rgba(6, 182, 212, 0.1); }
+        .stype.Video { color: var(--video); background: rgba(139, 92, 246, 0.1); }
+        .stype.Abandoned { color: var(--abandoned); background: rgba(244, 63, 94, 0.1); }
+        .stime { color: var(--text3); font-size: 12px; }
+        .stemplate { color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sdur { color: var(--text3); text-align: right; font-family: 'DM Mono', monospace; }
+        .new-tag { display: inline-block; font-size: 9px; font-weight: 700; color: #fff; background: var(--accent); padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; box-shadow: 0 0 8px rgba(59,130,246,0.5); }
+        .empty { display: flex; align-items: center; justify-content: center; height: 120px; color: var(--text3); font-size: 13px; font-weight: 500; }
 
-        .metric-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text2);
-            margin-bottom: 8px;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-        .metric-value {
-            font-size: 32px;
-            font-weight: 700;
-            line-height: 1;
-            color: var(--text);
-            letter-spacing: -1px;
-        }
-
-        .metric-sub {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text3);
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .trend-up {
-            color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .charts-2col {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .chart-card {
-            padding: 24px;
-        }
-
-            .chart-card.hidden {
-                display: none;
-            }
-
-        .chart-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .chart-wrap {
-            position: relative;
-            height: 280px;
-            width: 100%;
-        }
-
-        .tbl {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-            .tbl th {
-                text-align: left;
-                font-size: 11px;
-                font-weight: 600;
-                color: var(--text3);
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                padding: 0 12px 12px 12px;
-                border-bottom: 1px solid var(--border);
-            }
-
-            .tbl td {
-                padding: 12px;
-                border-bottom: 1px solid rgba(255,255,255,0.02);
-                color: var(--text2);
-                font-weight: 500;
-            }
-
-            .tbl tr:hover td {
-                background: rgba(255,255,255,0.02);
-                color: var(--text);
-            }
-
-            .tbl td:first-child {
-                color: var(--text);
-                font-weight: 600;
-            }
-
-        .tbar {
-            height: 4px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 6px;
-            min-width: 80px;
-        }
-
-        .tbar-fill {
-            height: 100%;
-            border-radius: 4px;
-        }
-
-        .sessions-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 350px;
-            overflow-y: auto;
-            padding-right: 8px;
-        }
-
-        .session-row {
-            display: grid;
-            grid-template-columns: 80px 140px 1fr 60px;
-            align-items: center;
-            gap: 16px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-
-            .session-row:hover {
-                background: var(--surface-hover);
-                border-color: var(--border2);
-                transform: translateY(-1px);
-            }
-
-        .stype {
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-            .stype.Photo {
-                color: var(--photo);
-                background: rgba(6, 182, 212, 0.1);
-            }
-
-            .stype.Video {
-                color: var(--video);
-                background: rgba(139, 92, 246, 0.1);
-            }
-
-            .stype.Abandoned {
-                color: var(--abandoned);
-                background: rgba(244, 63, 94, 0.1);
-            }
-
-        .stime {
-            color: var(--text3);
-            font-size: 12px;
-        }
-
-        .stemplate {
-            color: var(--text);
-            font-weight: 500;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .sdur {
-            color: var(--text3);
-            text-align: right;
-            font-family: 'DM Mono', monospace;
-        }
-
-        .new-tag {
-            display: inline-block;
-            font-size: 9px;
-            font-weight: 700;
-            color: #fff;
-            background: var(--accent);
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 6px;
-            vertical-align: middle;
-            box-shadow: 0 0 8px rgba(59,130,246,0.5);
-        }
-
-        .empty {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 120px;
-            color: var(--text3);
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-        }
-
-            ::-webkit-scrollbar-thumb:hover {
-                background: rgba(255,255,255,0.2);
-            }
-
-        @media (max-width: 1024px) {
-            .charts-2col {
-                grid-template-columns: 1fr;
-            }
-        }
-
+        @media (max-width: 1024px) { .charts-2col { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
-            .topbar {
-                padding: 12px 16px;
-                height: auto;
-                min-height: 56px;
-                flex-wrap: wrap;
-            }
+            .topbar { padding: 12px 16px; height: auto; min-height: 56px; flex-wrap: wrap; }
+            .logo { font-size: 14px; }
+            .last-update { display: none; }
+            .main { padding: 12px; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+            .metric-card { padding: 12px; border-radius: 12px; }
+            .metric-label { font-size: 11px; margin-bottom: 4px; }
+            .metric-value { font-size: 24px; }
+            .metric-sub { font-size: 9px; margin-top: 4px; }
+            .filter-bar { gap: 10px; padding: 12px; margin-bottom: 16px; justify-content: space-between; border-radius: 12px; }
+            .filter-group { flex: 1 1 calc(50% - 5px); }
+            
+            /* Responsive For Multi-Select */
+            .filter-select, .multi-select-container { min-width: 0; width: 100%; font-size: 12px; }
+            .multi-select-trigger { padding: 8px 24px 8px 8px; font-size: 12px; background-position: right 8px center; }
+            .multi-select-menu { right: 0; min-width: 100%; }
 
-            .logo {
-                font-size: 14px;
-            }
-
-            .last-update {
-                display: none;
-            }
-
-            .main {
-                padding: 12px;
-            }
-
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-                margin-bottom: 16px;
-            }
-
-            .metric-card {
-                padding: 12px;
-                border-radius: 12px;
-            }
-
-            .metric-label {
-                font-size: 11px;
-                margin-bottom: 4px;
-            }
-
-            .metric-value {
-                font-size: 24px;
-            }
-
-            .metric-sub {
-                font-size: 9px;
-                margin-top: 4px;
-            }
-
-            .filter-bar {
-                gap: 10px;
-                padding: 12px;
-                margin-bottom: 16px;
-                justify-content: space-between;
-                border-radius: 12px;
-            }
-
-            .filter-group {
-                flex: 1 1 calc(50% - 5px);
-            }
-
-            .filter-select {
-                min-width: 0;
-                width: 100%;
-                font-size: 12px;
-                padding: 8px 24px 8px 8px;
-                background-position: right 8px center;
-            }
-
-            .filter-reset {
-                flex: 1 1 100%;
-                background: rgba(255,255,255,0.05);
-                border-radius: 8px;
-                padding: 10px;
-                margin-top: 4px;
-                font-size: 13px;
-            }
-
-            .toggle-bar {
-                justify-content: flex-start;
-                margin-bottom: 16px;
-                gap: 6px;
-            }
-
-            .toggle-label {
-                width: 100%;
-                margin-bottom: 4px;
-                font-size: 11px;
-            }
-
-            .toggle-btn {
-                flex: 1 1 calc(33.33% - 6px);
-                padding: 8px 6px;
-                font-size: 11px;
-                text-align: center;
-                justify-content: center;
-            }
-
-            .chart-card {
-                padding: 16px 12px;
-                border-radius: 12px;
-            }
-
-            .chart-wrap {
-                height: 220px;
-            }
-
-            .chart-title {
-                font-size: 13px;
-                margin-bottom: 12px;
-            }
-
-            #templateWrap {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .tbl th, .tbl td {
-                white-space: nowrap;
-                padding: 8px;
-                font-size: 12px;
-            }
-
-            .session-row {
-                grid-template-columns: 60px 1fr 40px;
-                gap: 10px;
-                padding: 10px;
-                border-radius: 8px;
-            }
-
-            .stype {
-                padding: 4px;
-                font-size: 10px;
-            }
-
-            .stemplate {
-                font-size: 12px;
-            }
-
-            .stime {
-                display: none;
-            }
-
-            .sdur {
-                font-size: 11px;
-            }
+            .filter-reset { flex: 1 1 100%; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; margin-top: 4px; font-size: 13px; }
+            .toggle-bar { justify-content: flex-start; margin-bottom: 16px; gap: 6px; }
+            .toggle-label { width: 100%; margin-bottom: 4px; font-size: 11px; }
+            .toggle-btn { flex: 1 1 calc(33.33% - 6px); padding: 8px 6px; font-size: 11px; text-align: center; justify-content: center; }
+            .chart-card { padding: 16px 12px; border-radius: 12px; }
+            .chart-wrap { height: 220px; }
+            .chart-title { font-size: 13px; margin-bottom: 12px; }
+            #templateWrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .tbl th, .tbl td { white-space: nowrap; padding: 8px; font-size: 12px; }
+            .session-row { grid-template-columns: 60px 1fr 40px; gap: 10px; padding: 10px; border-radius: 8px; }
+            .stype { padding: 4px; font-size: 10px; }
+            .stemplate { font-size: 12px; }
+            .stime { display: none; }
+            .sdur { font-size: 11px; }
         }
-
-        @media (max-width: 375px) {
-            .toggle-btn {
-                flex: 1 1 calc(50% - 6px);
-            }
-        }
+        @media (max-width: 375px) { .toggle-btn { flex: 1 1 calc(50% - 6px); } }
     </style>
 </head>
 <body>
@@ -726,10 +244,18 @@
                     <label class="filter-label">Event</label>
                     <select class="filter-select" id="fEvent" onchange="setFilter('event',this.value)"></select>
                 </div>
+                
                 <div class="filter-group">
                     <label class="filter-label">Template</label>
-                    <select class="filter-select" id="fTemplate" onchange="setFilter('template',this.value)"></select>
+                    <div class="multi-select-container" id="templateSelectContainer">
+                        <div class="multi-select-trigger" onclick="toggleTemplateDropdown()">
+                            <span id="templateSelectLabel">All</span>
+                        </div>
+                        <div class="multi-select-menu" id="templateSelectMenu">
+                            </div>
+                    </div>
                 </div>
+
                 <div class="filter-group">
                     <label class="filter-label">Media Type</label>
                     <select class="filter-select" id="fMedia" onchange="setFilter('media',this.value)"></select>
@@ -783,14 +309,15 @@
     </div>
 
     <script>
-        // ── CONFIG ──────────────────────────────────────────────────
         const GH_OWNER = 'manonlichSmallgoodstudio';
         const GH_REPO = 'booth-dashboard';
         const CSV_URL = 'https://raw.githubusercontent.com/manonlichSmallgoodstudio/booth-dashboard/main/data/booth_stats.csv';
         const REFRESH_SEC = 10;
 
         let allData = [], prevCount = 0, refreshSec = REFRESH_SEC, refreshTimer = null;
-        let fDate = 'all', fEvent = 'all', fTemplate = 'all', fMedia = 'all';
+        
+        // 🛠 เปลี่ยน fTemplate เป็น Array สำหรับเก็บหลายค่า
+        let fDate = 'all', fEvent = 'all', fTemplate = ['all'], fMedia = 'all'; 
         let donutChart = null, timelineChart = null;
         let prevListCount = 0;
 
@@ -800,6 +327,19 @@
         Chart.defaults.scale.grid.borderColor = 'transparent';
 
         async function init() { await fetchCSV(); startLive(); }
+
+        // ฟังก์ชันเปิด/ปิดเมนู Dropdown
+        function toggleTemplateDropdown() {
+            document.getElementById('templateSelectContainer').classList.toggle('open');
+        }
+
+        // ปิดเมนูเมื่อคลิกนอกพื้นที่
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('templateSelectContainer');
+            if (container && !container.contains(event.target)) {
+                container.classList.remove('open');
+            }
+        });
 
         async function fetchCSV() {
             try {
@@ -849,7 +389,6 @@
             res.push(cur); return res;
         }
 
-        // 🛠️ ส่วนที่ 1: ตัวจับและแปลงวันที่แบบครอบจักรวาล ให้เป็น DD/MM/YYYY แบบมีศูนย์นำหน้า
         function parseCSV(text) {
             const lines = text.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
             if (lines.length < 2) return [];
@@ -859,25 +398,15 @@
                 const o = {};
                 hdr.forEach((h, i) => {
                     let val = (v[i] || '').replace(/^"|"$/g, '').trim();
-
                     if (h === 'Date' && val) {
                         const parts = val.split(/[-/]/);
                         if (parts.length === 3) {
                             let d, m, y;
-                            if (parts[0].length === 4) {
-                                // ถ้าเป็น YYYY-MM-DD หรือ YYYY/MM/DD
-                                y = parts[0]; m = parts[1]; d = parts[2];
-                            } else {
-                                // ถ้าเป็น D/M/YYYY หรือ DD/MM/YYYY
-                                d = parts[0]; m = parts[1]; y = parts[2];
-                            }
-                            // บังคับเติมเลข 0 นำหน้าให้เป็นมาตรฐานเดียวกันเป๊ะ (05 ไม่ใช่ 5)
-                            d = d.padStart(2, '0');
-                            m = m.padStart(2, '0');
-                            val = `${d}/${m}/${y}`;
+                            if (parts[0].length === 4) { y = parts[0]; m = parts[1]; d = parts[2]; } 
+                            else { d = parts[0]; m = parts[1]; y = parts[2]; }
+                            d = d.padStart(2, '0'); m = m.padStart(2, '0'); val = `${d}/${m}/${y}`;
                         }
                     }
-
                     o[h] = val;
                 });
                 return o;
@@ -890,15 +419,69 @@
             sel.innerHTML = `<option value="all">All</option>` + values.map(v => `<option value="${v}" ${v === current ? 'selected' : ''}>${v}</option>`).join('');
             if (current !== 'all' && values.includes(current)) sel.value = current;
         }
+        
+        // 🛠 Render หน้าตา Checkbox สำหรับ Template
+        function renderTemplateDropdown(templates) {
+            const menu = document.getElementById('templateSelectMenu');
+            let html = `
+                <label class="checkbox-label">
+                    <input type="checkbox" value="all" onchange="handleTemplateChange(this)" ${fTemplate.includes('all') ? 'checked' : ''}> All
+                </label>`;
+            
+            templates.forEach(t => {
+                const isChecked = fTemplate.includes(t) ? 'checked' : '';
+                html += `
+                <label class="checkbox-label">
+                    <input type="checkbox" value="${t}" onchange="handleTemplateChange(this)" ${isChecked}> ${t}
+                </label>`;
+            });
+            menu.innerHTML = html;
+            updateTemplateLabel();
+        }
 
-        // 🛠️ ส่วนที่ 2: ระบบเรียงวันที่จากน้อยไปมาก โดยอิงตามปฏิทินที่ถูกต้อง
+        // 🛠 จัดการเวลากด Checkbox
+        function handleTemplateChange(checkbox) {
+            const val = checkbox.value;
+            if (val === 'all') {
+                if (checkbox.checked) {
+                    fTemplate = ['all']; // ถ้าเลือก All ให้เคลียร์อันอื่นทิ้ง
+                } else {
+                    fTemplate = [];
+                }
+            } else {
+                fTemplate = fTemplate.filter(t => t !== 'all'); // เอา All ออกเมื่อเลือกอันเฉพาะเจาะจง
+                if (checkbox.checked) {
+                    fTemplate.push(val);
+                } else {
+                    fTemplate = fTemplate.filter(t => t !== val);
+                }
+            }
+
+            if (fTemplate.length === 0) fTemplate = ['all']; // ถ้าไม่ได้เลือกอะไรเลย ให้กลับเป็น All
+
+            // Re-render UI Checkbox ให้ติ๊กถูกตรงกัน และอัปเดตข้อมูลกราฟ
+            renderTemplateDropdown(uniq(allData.map(s => s.LayersUsed)));
+            render(false);
+        }
+
+        // 🛠 อัปเดตข้อความบนปุ่มกด (เช่น All, 1 selected, 3 selected)
+        function updateTemplateLabel() {
+            const label = document.getElementById('templateSelectLabel');
+            if (fTemplate.includes('all')) {
+                label.textContent = 'All';
+            } else if (fTemplate.length === 1) {
+                label.textContent = fTemplate[0]; // ถ้าเลือก 1 อัน โชว์ชื่อเลย
+            } else {
+                label.textContent = `${fTemplate.length} selected`; // ถ้าเลือกหลายอัน โชว์จำนวน
+            }
+        }
+
         function syncDropdowns() {
             let dates = [...new Set(allData.map(s => s.Date))].filter(Boolean);
             dates.sort((a, b) => {
                 const pA = a.split('/');
                 const pB = b.split('/');
                 if (pA.length === 3 && pB.length === 3) {
-                    // แปลงเทียบกันแบบ YYYYMMDD ทำให้ 01/06 (เดือนหก) ไปอยู่หลัง 31/05 (เดือนห้า)
                     const valA = pA[2] + pA[1] + pA[0];
                     const valB = pB[2] + pB[1] + pB[0];
                     return valA.localeCompare(valB);
@@ -908,21 +491,32 @@
 
             fillSelect('fDate', dates, fDate);
             fillSelect('fEvent', uniq(allData.map(s => s.EventName)), fEvent);
-            fillSelect('fTemplate', uniq(allData.map(s => s.LayersUsed)), fTemplate);
             fillSelect('fMedia', uniq(allData.map(s => s.MediaType)), fMedia);
+
+            // อัปเดตตัว Template Checkbox
+            renderTemplateDropdown(uniq(allData.map(s => s.LayersUsed)));
         }
 
         function setFilter(type, val) {
-            if (type === 'date') fDate = val; if (type === 'event') fEvent = val;
-            if (type === 'template') fTemplate = val; if (type === 'media') fMedia = val;
+            if (type === 'date') fDate = val; 
+            if (type === 'event') fEvent = val;
+            if (type === 'media') fMedia = val;
             render(false);
         }
-        function resetFilters() { fDate = fEvent = fTemplate = fMedia = 'all'; syncDropdowns(); render(false); }
+
+        function resetFilters() { 
+            fDate = fEvent = fMedia = 'all'; 
+            fTemplate = ['all']; // รีเซ็ต Template
+            syncDropdowns(); 
+            render(false); 
+        }
 
         function filtered() {
             return allData.filter(s =>
-                (fDate === 'all' || s.Date === fDate) && (fEvent === 'all' || s.EventName === fEvent) &&
-                (fTemplate === 'all' || s.LayersUsed === fTemplate) && (fMedia === 'all' || s.MediaType === fMedia)
+                (fDate === 'all' || s.Date === fDate) && 
+                (fEvent === 'all' || s.EventName === fEvent) &&
+                (fTemplate.includes('all') || fTemplate.includes(s.LayersUsed)) && // 🛠 ลอจิกกรองแบบ Array (Multi-select)
+                (fMedia === 'all' || s.MediaType === fMedia)
             );
         }
 
@@ -1031,19 +625,19 @@
             const max = rows[0]?.[1].total || 1;
             const colors = ['#3b82f6', '#06b6d4', '#8b5cf6', '#facc15', '#ec4899'];
             document.getElementById('templateWrap').innerHTML = `
-                <table class="tbl">
-                  <thead><tr><th>Layer / Template</th><th>Total</th><th>Distribution</th><th>Scans</th></tr></thead>
-                  <tbody>${rows.map(([t, v], i) => `
-                    <tr>
-                      <td style="color:#e2e8f0">${t}</td>
-                      <td style="font-size:16px; font-weight:700">${v.total}</td>
-                      <td style="width:40%; min-width: 100px;">
-                        <div class="tbar"><div class="tbar-fill" style="width:${Math.round(v.total / max * 100)}%;background:${colors[i % colors.length]};box-shadow: 0 0 10px ${colors[i % colors.length]}"></div></div>
-                      </td>
-                      <td>${v.qr}</td>
-                    </tr>`).join('')}
-                  </tbody>
-                </table>`;
+            <table class="tbl">
+              <thead><tr><th>Layer / Template</th><th>Total</th><th>Distribution</th><th>Scans</th></tr></thead>
+              <tbody>${rows.map(([t, v], i) => `
+                <tr>
+                  <td style="color:#e2e8f0">${t}</td>
+                  <td style="font-size:16px; font-weight:700">${v.total}</td>
+                  <td style="width:40%; min-width: 100px;">
+                    <div class="tbar"><div class="tbar-fill" style="width:${Math.round(v.total / max * 100)}%;background:${colors[i % colors.length]};box-shadow: 0 0 10px ${colors[i % colors.length]}"></div></div>
+                  </td>
+                  <td>${v.qr}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>`;
         }
 
         function renderSessions(d, flash) {
@@ -1053,12 +647,12 @@
             document.getElementById('sessionsList').innerHTML = recent.length === 0
                 ? '<div class="empty">No interactions yet</div>'
                 : recent.map((s, i) => `
-                  <div class="session-row">
-                    <span class="stype ${s.MediaType}">${s.MediaType}</span>
-                    <span class="stime">${s.Date} <br/> <strong style="color:#e2e8f0">${s.Time}</strong></span>
-                    <span class="stemplate">${s.EventName} <br/><span style="color:var(--text3); font-size:11px">${s.LayersUsed || '—'}</span></span>
-                    <span class="sdur">${parseFloat(s['Duration(sec)']).toFixed(1)}s ${i < newCount ? '<span class="new-tag">NEW</span>' : ''}</span>
-                  </div>`).join('');
+              <div class="session-row">
+                <span class="stype ${s.MediaType}">${s.MediaType}</span>
+                <span class="stime">${s.Date} <br/> <strong style="color:#e2e8f0">${s.Time}</strong></span>
+                <span class="stemplate">${s.EventName} <br/><span style="color:var(--text3); font-size:11px">${s.LayersUsed || '—'}</span></span>
+                <span class="sdur">${parseFloat(s['Duration(sec)']).toFixed(1)}s ${i < newCount ? '<span class="new-tag">NEW</span>' : ''}</span>
+              </div>`).join('');
         }
 
         document.querySelectorAll('.toggle-btn').forEach(btn => {
