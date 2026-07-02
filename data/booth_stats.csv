@@ -1,4 +1,4 @@
-﻿Session,EventName,Date,Time,FullName,Phone,Email,Gender,BirthDate,MediaType,Duration(sec),LayersUsed,QR_Scans,SavedToDevice,SharedToSocial,FileName
+﻿Session,EventName,Date,Time,FullName,Phone,Email,Gender,BirthDate,MediaType,Duration(sec),LayersUsed,QR_Scans,SavedToDevice,SharedToSocial,FileName,PDPA
 1,No Event Name,26/5/2026,4:33:28,N/A,N/A,N/A,N/A,N/A,Photo,21.4,pride,1,0,0,SGS_Event_2026-05-26_04-33-28.jpg
 2,No Event Name,26/5/2026,4:34:29,N/A,N/A,N/A,N/A,N/A,Abandoned,23.3,pride,0,0,0,N/A
 3,No Event Name,26/5/2026,4:34:59,N/A,N/A,N/A,N/A,N/A,Video,15,nextopia,1,0,0,SGS_Event_2026-05-26_04-34-59.mp4
