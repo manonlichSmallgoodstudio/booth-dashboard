@@ -254,6 +254,11 @@
     <div class="topbar">
         <div class="topbar-left">
             <span class="logo">Booth Interactive Monitor</span>
+            <span class="env-badge-dev" id="envBadgeDev">DEV MODE</span>
+            <div class="env-switcher">
+                <a href="?env=prod" class="env-tab" id="tabProd">PROD</a>
+                <a href="?env=dev" class="env-tab" id="tabDev">DEV</a>
+            </div>
             <div class="live-pill" id="livePill"><div class="live-dot"></div> SYNCING</div>
         </div>
         <div class="topbar-right">
@@ -372,7 +377,7 @@
             if (isDev) {
                 document.getElementById('tabDev')?.classList.add('active');
                 document.getElementById('tabProd')?.classList.remove('active');
-                document.getElementById('envBadgeDev').style.display = 'inline-block';
+                const envBadge = document.getElementById('envBadgeDev'); if (envBadge) envBadge.style.display = 'inline-block';
                 document.title = '[DEV] Booth Dashboard';
             } else {
                 document.getElementById('tabProd')?.classList.add('active');
