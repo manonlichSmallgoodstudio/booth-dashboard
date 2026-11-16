@@ -254,6 +254,11 @@
     <div class="topbar">
         <div class="topbar-left">
             <span class="logo">Booth Interactive Monitor</span>
+            <span class="env-badge-dev" id="envBadgeDev">DEV MODE</span>
+            <div class="env-switcher">
+                <a href="../" class="env-tab" id="tabProd">PROD</a>
+                <a href="./" class="env-tab" id="tabDev">DEV</a>
+            </div>
             <div class="live-pill" id="livePill"><div class="live-dot"></div> SYNCING</div>
         </div>
         <div class="topbar-right">
@@ -347,7 +352,12 @@
     <script>
         const GH_OWNER = 'manonlichSmallgoodstudio';
         const GH_REPO = 'booth-dashboard';
-        const CSV_URL = 'https://raw.githubusercontent.com/manonlichSmallgoodstudio/booth-dashboard/main/data/booth_stats.csv';
+
+        // 🌿 Environment Branch Resolver
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDev = urlParams.get('env') === 'dev' || window.location.pathname.includes('/dev');
+        const currentBranch = isDev ? 'dev' : 'main';
+        const CSV_URL = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${currentBranch}/data/booth_stats.csv`;
         const REFRESH_SEC = 10;
 
         let allData = [], prevCount = 0, refreshSec = REFRESH_SEC, refreshTimer = null;
@@ -367,7 +377,7 @@
             if (isDev) {
                 document.getElementById('tabDev')?.classList.add('active');
                 document.getElementById('tabProd')?.classList.remove('active');
-                document.getElementById('envBadgeDev').style.display = 'inline-block';
+                const envBadge = document.getElementById('envBadgeDev'); if (envBadge) envBadge.style.display = 'inline-block';
                 document.title = '[DEV] Booth Dashboard';
             } else {
                 document.getElementById('tabProd')?.classList.add('active');
