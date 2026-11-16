@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[DEV] Booth Dashboard</title>
+    <title>Booth Dashboard</title>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
 
@@ -211,6 +211,42 @@
             .sdur { font-size: 11px; }
         }
         @media (max-width: 375px) { .toggle-btn { flex: 1 1 calc(50% - 6px); } }
+    
+        .env-switcher {
+            display: inline-flex;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 2px;
+            gap: 2px;
+            margin-left: 12px;
+        }
+        .env-tab {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .env-tab:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .env-tab.active {
+            background: #2563eb;
+            color: #ffffff;
+        }
+        .env-badge-dev {
+            display: none;
+            background: #f59e0b;
+            color: #000;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
     </style>
 </head>
 <body>
@@ -218,6 +254,11 @@
     <div class="topbar">
         <div class="topbar-left">
             <span class="logo">Booth Interactive Monitor</span>
+            <span class="env-badge-dev" id="envBadgeDev">DEV MODE</span>
+            <div class="env-switcher">
+                <a href="?env=prod" class="env-tab" id="tabProd">PROD</a>
+                <a href="?env=dev" class="env-tab" id="tabDev">DEV</a>
+            </div>
             <div class="live-pill" id="livePill"><div class="live-dot"></div> SYNCING</div>
         </div>
         <div class="topbar-right">
@@ -311,7 +352,12 @@
     <script>
         const GH_OWNER = 'manonlichSmallgoodstudio';
         const GH_REPO = 'booth-dashboard';
-        const CSV_URL = 'https://raw.githubusercontent.com/manonlichSmallgoodstudio/booth-dashboard/dev/data/booth_stats.csv';
+
+        // 🌿 Environment Branch Resolver
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDev = urlParams.get('env') === 'dev' || window.location.pathname.includes('/dev');
+        const currentBranch = isDev ? 'dev' : 'main';
+        const CSV_URL = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${currentBranch}/data/booth_stats.csv`;
         const REFRESH_SEC = 10;
 
         let allData = [], prevCount = 0, refreshSec = REFRESH_SEC, refreshTimer = null;
@@ -326,7 +372,20 @@
         Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
         Chart.defaults.scale.grid.borderColor = 'transparent';
 
-        async function init() { await fetchCSV(); startLive(); }
+        async function init() {
+            // Setup Environment UI
+            if (isDev) {
+                document.getElementById('tabDev')?.classList.add('active');
+                document.getElementById('tabProd')?.classList.remove('active');
+                const envBadge = document.getElementById('envBadgeDev'); if (envBadge) envBadge.style.display = 'inline-block';
+                document.title = '[DEV] Booth Dashboard';
+            } else {
+                document.getElementById('tabProd')?.classList.add('active');
+                document.getElementById('tabDev')?.classList.remove('active');
+            }
+            await fetchCSV();
+            startLive();
+        }
 
         // ฟังก์ชันเปิด/ปิดเมนู Dropdown
         function toggleTemplateDropdown() {
@@ -356,7 +415,7 @@
                 allData = parsed;
                 setStatus('');
                 document.getElementById('fileName').textContent = `Live Data Connection`;
-                document.getElementById('fileMeta').textContent = `Total Records: ${allData.length} | Last Sync: ${new Date().toLocaleTimeString('th-TH')}`;
+                document.getElementById('fileMeta').textContent = `[Branch: ${currentBranch}] Total Records: ${allData.length} | Last Sync: ${new Date().toLocaleTimeString('th-TH')}`;
                 document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('th-TH');
                 document.getElementById('dashboard').style.display = 'block';
                 syncDropdowns(); render(isNew);
