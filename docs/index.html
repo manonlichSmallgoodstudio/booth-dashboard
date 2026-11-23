@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -213,7 +213,7 @@
         @media (max-width: 375px) { .toggle-btn { flex: 1 1 calc(50% - 6px); } }
     
         .env-switcher {
-            display: inline-flex;
+            display: none;
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
@@ -255,7 +255,7 @@
         <div class="topbar-left">
             <span class="logo">Booth Interactive Monitor</span>
             <span class="env-badge-dev" id="envBadgeDev">DEV MODE</span>
-            <div class="env-switcher">
+            <div class="env-switcher" id="envSwitcher">
                 <a href="?env=prod" class="env-tab" id="tabProd">PROD</a>
                 <a href="?env=dev" class="env-tab" id="tabDev">DEV</a>
             </div>
@@ -374,14 +374,15 @@
 
         async function init() {
             // Setup Environment UI
+            const envSwitcher = document.getElementById('envSwitcher');
             if (isDev) {
+                if (envSwitcher) envSwitcher.style.display = 'inline-flex';
                 document.getElementById('tabDev')?.classList.add('active');
                 document.getElementById('tabProd')?.classList.remove('active');
                 const envBadge = document.getElementById('envBadgeDev'); if (envBadge) envBadge.style.display = 'inline-block';
                 document.title = '[DEV] Booth Dashboard';
             } else {
-                document.getElementById('tabProd')?.classList.add('active');
-                document.getElementById('tabDev')?.classList.remove('active');
+                if (envSwitcher) envSwitcher.remove();
             }
             await fetchCSV();
             startLive();
